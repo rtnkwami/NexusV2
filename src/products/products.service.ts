@@ -82,16 +82,16 @@ export class ProductsService {
     };
   }
 
-  findOne(id: string) {
-    return this.productRepository.findOneBy({ id });
+  findOne(uuid: string) {
+    return this.productRepository.findOneBy({ id: uuid });
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
-    await this.productRepository.update(id, updateProductDto);
-    return this.productRepository.findOneBy({ id });
+  async update(uuid: string, updateProductDto: UpdateProductDto) {
+    await this.productRepository.update(uuid, updateProductDto);
+    return this.productRepository.findOneBy({ id: uuid });
   }
 
-  remove(id: string) {
-    return this.productRepository.delete(id);
+  remove(uuid: string) {
+    return this.productRepository.delete(uuid);
   }
 }
