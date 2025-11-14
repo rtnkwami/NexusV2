@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ProductsModule } from './products/products.module';
 import Joi from 'joi';
+import { AppDataSource } from './data-source';
 
 @Module({
   imports: [
@@ -20,17 +20,8 @@ import Joi from 'joi';
         abortEarly: true,
       },
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DATABASE_HOST,
-      port: parseInt(process.env.DATABASE_PORT!, 10) || 5432,
-      username: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_NAME || 'test',
-      entities: [],
-    }),
+    TypeOrmModule.forRoot(AppDataSource.options),
+    ProductsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}
