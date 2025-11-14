@@ -13,8 +13,17 @@ export class UsersService {
   ) {}
 
   register(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto);
-    return this.userRepository.save(user);
+    const user: Partial<User> = {
+      name: createUserDto.email,
+      email: createUserDto.email,
+    };
+
+    if (createUserDto.picture) {
+      user.avatar = createUserDto.picture;
+    }
+
+    const registeredUser = this.userRepository.create(user);
+    return this.userRepository.save(registeredUser);
   }
 
   findAll() {

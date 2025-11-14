@@ -13,6 +13,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 @Auth()
@@ -20,7 +21,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  register(@CurrentUser() user: DecodedIdToken) {
+  register(@CurrentUser() user: CreateUserDto) {
     return this.usersService.register(user);
   }
 
@@ -44,11 +45,11 @@ export class UsersController {
     @CurrentUser() user: DecodedIdToken,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(user.uid, updateUserDto);
+    return this.usersService.update(user.sub, updateUserDto);
   }
 
   @Delete('me')
   remove(@CurrentUser() user: DecodedIdToken) {
-    return this.usersService.remove(user.uid);
+    return this.usersService.remove(user.sub);
   }
 }
