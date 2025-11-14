@@ -5,6 +5,9 @@ import { ProductsModule } from './products/products.module';
 import Joi from 'joi';
 import { AppDataSource } from './data-source';
 import { UsersModule } from './users/users.module';
+import { CartsModule } from './carts/carts.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
@@ -16,14 +19,24 @@ import { UsersModule } from './users/users.module';
         DATABASE_NAME: Joi.string().required(),
         DATABASE_PORT: Joi.number().port().required(),
         DATABASE_HOST: Joi.string().required(),
+        REDIS_URL: Joi.string().uri(),
       }),
       validationOptions: {
         abortEarly: true,
       },
     }),
     TypeOrmModule.forRoot(AppDataSource.options),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      useFactory: () => {
+        return {
+          stores: [new KeyvRedis(process.env.REDIS_URL)],
+        };
+      },
+    }),
     ProductsModule,
     UsersModule,
+    CartsModule,
   ],
 })
 export class AppModule {}
