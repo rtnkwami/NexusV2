@@ -1,8 +1,12 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { OrderProduct } from './order-product.entity';
 
 export type OrderStatusType = 'pending' | 'cancelled' | 'completed';
 
@@ -20,4 +24,13 @@ export class Order {
 
   @Column()
   total: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
+  products: OrderProduct[];
 }
