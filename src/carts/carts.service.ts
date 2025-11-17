@@ -22,8 +22,7 @@ export class CartsService {
     return this.cacheManager.set<UpdateCartDto>(cartKey, data);
   }
 
-  async clearCart(cartKey: string): Promise<UpdateCartDto[] | null> {
-    const cart = await this.cacheManager.del(cartKey);
-    return cart ? [] : null;
+  async clearCart(cartKey: string) {
+    return await this.cacheManager.del(cartKey);
   }
 }
