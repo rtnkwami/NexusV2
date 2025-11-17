@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { OrderProduct } from './order-product.entity';
 import { User } from 'src/users/entities/user.entity';
+import { OrderStatus } from '../dto/update-order.dto';
 
 export type OrderStatusType = 'pending' | 'cancelled' | 'completed';
 
@@ -19,8 +20,8 @@ export class Order {
 
   @Column({
     type: 'enum',
-    enum: ['pending', 'cancelled', 'completed'],
-    default: 'pending',
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
   })
   status: OrderStatusType;
 
