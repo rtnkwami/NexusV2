@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -80,6 +84,20 @@ export class ProductsService {
       total: totalItems,
       totalPages: Math.ceil(totalItems / take),
     };
+  }
+
+  async ensureSufficientStock(uuid: string, desiredQuantity: number) {
+    const product = await this.productRepository.findOneBy({ id: uuid });
+    if (!product) {
+      throw new NotFoundException('Product does not exist. Cannot be ordered');
+    }
+
+    const currentStock = product.stock;
+    if (currentStock < desiredQuantity) {
+      throw new BadRequestException(
+        `Insufficient stock for product ${product.name}. Available ${product.stock}, Requested: ${desiredQuantity}`,
+      );
+    }
   }
 
   findOne(uuid: string) {
