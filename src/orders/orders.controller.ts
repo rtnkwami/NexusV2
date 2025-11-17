@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Auth } from 'src/auth/auth.decorator';
@@ -41,10 +33,5 @@ export class OrdersController {
   ) {
     const newStatus = updateOrderDto.status;
     return this.ordersService.updateStatus(uuid, newStatus);
-  }
-
-  @Delete(':uuid')
-  remove(@Param('uuid') uuid: string) {
-    return this.ordersService.remove(uuid);
   }
 }

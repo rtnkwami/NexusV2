@@ -116,8 +116,4 @@ export class OrdersService {
   updateStatus(uuid: string, newStatus: OrderStatus) {
     return this.orderRepository.update({ id: uuid }, { status: newStatus });
   }
-
-  remove(uuid: string) {
-    return `This action removes a order`;
-  }
 }
