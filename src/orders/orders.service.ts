@@ -1,8 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UpdateOrderDto } from './dto/update-order.dto';
+import { OrderStatus } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { Between, DataSource, FindOptionsWhere, ILike, Repository } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  FindOptionsWhere,
+  ILike,
+  Repository,
+} from 'typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { ProductsService } from 'src/products/products.service';
 import { OrderProduct } from './entities/order-product.entity';
@@ -107,8 +113,8 @@ export class OrdersService {
     return this.orderRepository.findOneBy({ id: uuid });
   }
 
-  update(uuid: string, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a order`;
+  updateStatus(uuid: string, newStatus: OrderStatus) {
+    return this.orderRepository.update({ id: uuid }, { status: newStatus });
   }
 
   remove(uuid: string) {

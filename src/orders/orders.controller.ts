@@ -35,8 +35,12 @@ export class OrdersController {
   }
 
   @Patch(':uuid')
-  update(@Param('uuid') uuid: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(uuid, updateOrderDto);
+  updateStatus(
+    @Param('uuid') uuid: string,
+    @Body() updateOrderDto: UpdateOrderDto,
+  ) {
+    const newStatus = updateOrderDto.status;
+    return this.ordersService.updateStatus(uuid, newStatus);
   }
 
   @Delete(':uuid')
