@@ -2,11 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { DataSource, Repository } from 'typeorm';
+import { Between, DataSource, FindOptionsWhere, ILike, Repository } from 'typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { ProductsService } from 'src/products/products.service';
 import { OrderProduct } from './entities/order-product.entity';
 import { Product } from 'src/products/entities/product.entity';
+import { OrderSearchFilters } from './types/order-search';
 
 @Injectable()
 export class OrdersService {
@@ -62,19 +63,55 @@ export class OrdersService {
     return newOrder;
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async search(filters?: OrderSearchFilters, page?: number, limit?: number) {
+    const take = limit ?? 20;
+    const currentPage = page ?? 1;
+    const skip = ((currentPage ?? 1) - 1) * take;
+
+    const whereClause: FindOptionsWhere<Order> = {};
+
+    if (filters?.customer) {
+      whereClause.user = {
+        name: ILike(`%${filters.customer}%`),
+      };
+    }
+
+    if (filters?.dateRange) {
+      whereClause.createdAt = Between(
+        filters.dateRange.from,
+        filters.dateRange.to,
+      );
+    }
+
+    if (filters?.status) {
+      whereClause.status = filters.status;
+    }
+
+    const [orders, totalOrders] = await this.orderRepository.findAndCount({
+      where: whereClause,
+      skip,
+      take,
+    });
+
+    return {
+      data: orders,
+      page: currentPage,
+      perPage: take,
+      count: orders.length,
+      total: totalOrders,
+      totalPages: Math.ceil(totalOrders / take),
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  findOne(uuid: string) {
+    return this.orderRepository.findOneBy({ id: uuid });
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  update(uuid: string, updateOrderDto: UpdateOrderDto) {
+    return `This action updates a order`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  remove(uuid: string) {
+    return `This action removes a order`;
   }
 }
