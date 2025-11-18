@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { auth } from 'src/auth/auth.config';
 
 @Injectable()
 export class UsersService {
@@ -12,8 +13,9 @@ export class UsersService {
     private userRepository: Repository<User>,
   ) {}
 
-  register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto) {
     const user: Partial<User> = {
+      id: createUserDto.uid,
       name: createUserDto.email,
       email: createUserDto.email,
     };
@@ -21,6 +23,8 @@ export class UsersService {
     if (createUserDto.picture) {
       user.avatar = createUserDto.picture;
     }
+
+    await auth.setCustomUserClaims(createUserDto.uid, { roles: ['user'] });
 
     const registeredUser = this.userRepository.create(user);
     return this.userRepository.save(registeredUser);
