@@ -12,7 +12,7 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   avatar: string;
 
   @OneToMany(() => Order, (orders) => orders.user)
