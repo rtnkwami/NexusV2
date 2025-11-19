@@ -1,6 +1,7 @@
 "use client"
 
 import { auth } from "@/auth";
+import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
@@ -10,6 +11,7 @@ import { createUserWithEmailAndPassword,
   updateProfile,
   User
 } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface IAuthContext {
@@ -17,19 +19,22 @@ interface IAuthContext {
     email: string,
     password: string,
     name: string,
-  ) => Promise<void>
-  loginWithEmail: (email: string, password: string) => Promise<void>
-  loginWithGoogle: () => Promise<void>
+  ) => Promise<FirebaseError | undefined>
+  loginWithEmail: (email: string, password: string) => Promise<FirebaseError | undefined>
+  continueWithGoogle: () => Promise<FirebaseError | undefined>
   logout: () => Promise<void>
   user: User | null
   getToken: () => Promise<string | null>;
   syncUserToBackend: (user: User) => Promise<void>;
+  authError: FirebaseError | null
 }
 
 const AuthContext = createContext<IAuthContext | undefined> (undefined)
 
 export function AuthProvider ({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null)
+  const [authError, setError] = useState<FirebaseError | null>(null)
+  const router = useRouter()
 
   /**
    * Sets up a Firebase auth listener when the component loads.
@@ -60,26 +65,42 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
   }
 
   const signUpWithEmailAndPassword = async (email: string, password: string, name: string) => {
-    const { user } = await createUserWithEmailAndPassword(auth, email, password)
-    updateProfile(user, {
-      displayName: name
-    })
-    console.log(user)
-    await syncUserToBackend(user)
+    try {
+      const { user } = await createUserWithEmailAndPassword(auth, email, password)
+      updateProfile(user, {
+        displayName: name
+      })
+      await syncUserToBackend(user)
+    } catch (error) {
+      setError(error as FirebaseError)
+      return error as FirebaseError;
+    }
   }
 
   const loginWithEmail = async (email: string, password: string) => {
-    const { user } = await signInWithEmailAndPassword(auth, email, password)
-    await syncUserToBackend(user)
+    try {
+      const { user } = await signInWithEmailAndPassword(auth, email, password)
+      await syncUserToBackend(user)
+    } catch (error) {
+      setError(error as FirebaseError)
+      console.log(error)
+      return error as FirebaseError
+    }
   }
 
-  const loginWithGoogle = async () => {
-    const { user } = await signInWithPopup(auth, new GoogleAuthProvider())
-    await syncUserToBackend(user)
+  const continueWithGoogle = async () => {
+    try {
+      const { user } = await signInWithPopup(auth, new GoogleAuthProvider())
+      await syncUserToBackend(user)
+      router.push('/')
+    } catch (error) {
+      return error as FirebaseError
+    }
   }
 
   const logout = async () => {
     await signOut(auth);
+    router.push('/')
   }
 
   return (
@@ -89,8 +110,9 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
       syncUserToBackend,
       signUpWithEmailAndPassword,
       loginWithEmail,
-      loginWithGoogle,
-      logout
+      continueWithGoogle,
+      logout,
+      authError,
     }}>
       { children }
     </AuthContext.Provider>
