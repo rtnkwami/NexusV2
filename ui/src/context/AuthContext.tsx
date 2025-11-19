@@ -1,10 +1,23 @@
 "use client"
 
 import { auth } from "@/auth";
-import { GoogleAuthProvider, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut, User } from "firebase/auth";
+import { createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updateProfile,
+  User
+} from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 
 interface IAuthContext {
+  signUpWithEmailAndPassword: (
+    email: string,
+    password: string,
+    name: string,
+  ) => Promise<void>
   loginWithEmail: (email: string, password: string) => Promise<void>
   loginWithGoogle: () => Promise<void>
   logout: () => Promise<void>
@@ -35,8 +48,8 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
     return await user.getIdToken()
   }
 
-  const syncUserToBackend = async () => {
-    const token = await getToken()
+  const syncUserToBackend = async (user: User) => {
+    const token = await user.getIdToken()
     await fetch('http://localhost:5000/users/', {
       method: 'POST',
       headers: { 
@@ -46,14 +59,23 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
     })
   }
 
+  const signUpWithEmailAndPassword = async (email: string, password: string, name: string) => {
+    const { user } = await createUserWithEmailAndPassword(auth, email, password)
+    updateProfile(user, {
+      displayName: name
+    })
+    console.log(user)
+    await syncUserToBackend(user)
+  }
+
   const loginWithEmail = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password)
-    syncUserToBackend()
+    const { user } = await signInWithEmailAndPassword(auth, email, password)
+    await syncUserToBackend(user)
   }
 
   const loginWithGoogle = async () => {
-    await signInWithPopup(auth, new GoogleAuthProvider())
-    syncUserToBackend()
+    const { user } = await signInWithPopup(auth, new GoogleAuthProvider())
+    await syncUserToBackend(user)
   }
 
   const logout = async () => {
@@ -65,6 +87,7 @@ export function AuthProvider ({ children }: { children: React.ReactNode }) {
       user,
       getToken,
       syncUserToBackend,
+      signUpWithEmailAndPassword,
       loginWithEmail,
       loginWithGoogle,
       logout
