@@ -16,7 +16,7 @@ import { CurrentUser } from 'src/auth/user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
-@Auth()
+@Auth('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -26,11 +26,13 @@ export class UsersController {
   }
 
   @Get()
+  @Auth('admin')
   findAll() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
+  @Auth('admin')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
