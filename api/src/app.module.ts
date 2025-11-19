@@ -19,6 +19,9 @@ import KeyvRedis from '@keyv/redis';
         DATABASE_NAME: Joi.string().required(),
         DATABASE_PORT: Joi.number().port().required(),
         DATABASE_HOST: Joi.string().required(),
+        FIREBASE_PROJECT_ID: Joi.string().required(),
+        FIREBASE_PRIVATE_KEY: Joi.string().required(),
+        FIREBASE_CLIENT_EMAIL: Joi.string().required(),
         REDIS_URL: Joi.string().uri(),
       }),
       validationOptions: {
