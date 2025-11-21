@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { CartsModule } from './carts/carts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import KeyvRedis from '@keyv/redis';
     ProductsModule,
     UsersModule,
     CartsModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}

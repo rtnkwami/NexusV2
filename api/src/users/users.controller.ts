@@ -15,7 +15,10 @@ import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 
-@Controller('users')
+@Controller({
+  path: 'users',
+  version: '1',
+})
 @Auth('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
