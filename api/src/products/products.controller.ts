@@ -13,7 +13,17 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductSearchFilters } from './types/product-search';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  OmitType,
+} from '@nestjs/swagger';
+import { Product } from './entities/product.entity';
+import { ApiOptionalQuery } from 'src/openapi-decorators/optional-query.decorator';
+import { ProductSearchResponseDto } from './dto/search-product-response.dto';
 
+@ApiBearerAuth()
 @Controller({
   path: 'products',
   version: '1',
@@ -21,20 +31,39 @@ import { ProductSearchFilters } from './types/product-search';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @ApiOperation({
+    summary: 'Create product.',
+    description: 'Create a product. Auth is required',
+  })
+  @ApiResponse({ status: 201, type: OmitType(Product, ['orders']) })
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
+  createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
 
+  @ApiOperation({
+    summary: 'Get products',
+    description: 'Search for products given filters',
+  })
+  @ApiOptionalQuery([
+    'q',
+    'minPrice',
+    'maxPrice',
+    'minStock',
+    'maxStock',
+    'page',
+    'limit',
+  ])
+  @ApiResponse({ status: 200, type: ProductSearchResponseDto })
   @Get()
   search(
-    @Query('q') q: string,
-    @Query('minPrice') minPrice: number,
-    @Query('maxPrice') maxPrice: number,
-    @Query('minStock') minStock: number,
-    @Query('maxStock') maxStock: number,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query('q') q?: string,
+    @Query('minPrice') minPrice?: number,
+    @Query('maxPrice') maxPrice?: number,
+    @Query('minStock') minStock?: number,
+    @Query('maxStock') maxStock?: number,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
   ) {
     const filters: ProductSearchFilters = {
       ...(q && { searchQuery: q }),
