@@ -100,13 +100,21 @@ export class ProductsService {
     }
   }
 
-  findOne(uuid: string) {
-    return this.productRepository.findOneBy({ id: uuid });
+  async findOne(uuid: string) {
+    const product = await this.productRepository.findOneBy({ id: uuid });
+    if (!product) {
+      throw new NotFoundException('Product does not exist');
+    }
+    return product;
   }
 
   async update(uuid: string, updateProductDto: UpdateProductDto) {
-    await this.productRepository.update(uuid, updateProductDto);
-    return this.productRepository.findOneBy({ id: uuid });
+    const product = await this.productRepository.findOneBy({ id: uuid });
+    if (!product) {
+      throw new NotFoundException('Product does not exist');
+    }
+    Object.assign(product, updateProductDto);
+    return this.productRepository.save(product);
   }
 
   remove(uuid: string) {
