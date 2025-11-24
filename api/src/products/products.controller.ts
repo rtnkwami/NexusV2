@@ -15,15 +15,16 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductSearchFilters } from './types/product-search';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOperation,
   ApiResponse,
-  OmitType,
 } from '@nestjs/swagger';
-import { Product } from './entities/product.entity';
 import { ApiOptionalQuery } from 'src/openapi-decorators/optional-query.decorator';
-import { ProductSearchResponseDto } from './dto/search-product-response.dto';
+import {
+  ProductSearchResponseDto,
+  ProductWithoutOrdersDto,
+} from './dto/search-product-response.dto';
 
-@ApiBearerAuth()
 @Controller({
   path: 'products',
   version: '1',
@@ -31,11 +32,12 @@ import { ProductSearchResponseDto } from './dto/search-product-response.dto';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Create product.',
+    summary: 'Create product',
     description: 'Create a product. Auth is required',
   })
-  @ApiResponse({ status: 201, type: OmitType(Product, ['orders']) })
+  @ApiResponse({ status: 201, type: ProductWithoutOrdersDto })
   @Post()
   createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
@@ -78,11 +80,24 @@ export class ProductsController {
     return this.productsService.search(filters, page, limit);
   }
 
+  @ApiOperation({
+    summary: 'Get a product',
+    description: 'Get a single product. A valid uuid must be used.',
+  })
+  @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @Get(':uuid')
   findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productsService.findOne(uuid);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Update a product',
+    description:
+      'Update a single product. A valid uuid must be used. Auth is required.',
+  })
+  @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
+  @ApiBody({ required: false, type: UpdateProductDto })
   @Patch(':uuid')
   update(
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
@@ -91,6 +106,13 @@ export class ProductsController {
     return this.productsService.update(uuid, updateProductDto);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete a product',
+    description:
+      'Delete a single product. A valid uuid must be used. Auth is required.',
+  })
+  @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @Delete(':uuid')
   remove(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productsService.remove(uuid);
