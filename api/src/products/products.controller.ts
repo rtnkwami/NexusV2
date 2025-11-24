@@ -58,7 +58,7 @@ export class ProductsController {
   ])
   @ApiResponse({ status: 200, type: ProductSearchResponseDto })
   @Get()
-  search(
+  searchProducts(
     @Query('q') q?: string,
     @Query('minPrice') minPrice?: number,
     @Query('maxPrice') maxPrice?: number,
@@ -86,7 +86,7 @@ export class ProductsController {
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @Get(':uuid')
-  findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+  getProduct(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productsService.findOne(uuid);
   }
 
@@ -99,7 +99,7 @@ export class ProductsController {
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @ApiBody({ required: false, type: UpdateProductDto })
   @Patch(':uuid')
-  update(
+  updateProduct(
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
@@ -114,7 +114,7 @@ export class ProductsController {
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @Delete(':uuid')
-  remove(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+  deleteProduct(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productsService.remove(uuid);
   }
 }

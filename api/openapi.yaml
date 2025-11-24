@@ -25,7 +25,7 @@ paths:
         - Products
     get:
       description: Search for products given filters
-      operationId: search
+      operationId: searchProducts
       parameters:
         - name: q
           required: false
@@ -74,7 +74,7 @@ paths:
   /products/{uuid}:
     get:
       description: Get a single product. A valid uuid must be used.
-      operationId: findOne
+      operationId: getProduct
       parameters:
         - name: uuid
           required: true
@@ -92,7 +92,7 @@ paths:
       tags: *a1
     patch:
       description: Update a single product. A valid uuid must be used. Auth is required.
-      operationId: update
+      operationId: updateProduct
       parameters:
         - name: uuid
           required: true
@@ -118,7 +118,7 @@ paths:
       tags: *a1
     delete:
       description: Delete a single product. A valid uuid must be used. Auth is required.
-      operationId: remove
+      operationId: deleteProduct
       parameters:
         - name: uuid
           required: true
