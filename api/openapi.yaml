@@ -1,0 +1,573 @@
+openapi: 3.0.0
+paths:
+  /products:
+    post:
+      description: Create a product. Auth is required
+      operationId: createProduct
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProductDto"
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductWithoutOrdersDto"
+      security:
+        - bearer: []
+      summary: Create product
+      tags: &a1
+        - Products
+    get:
+      description: Search for products given filters
+      operationId: search
+      parameters:
+        - name: q
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: minPrice
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: maxPrice
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: minStock
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: maxStock
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: limit
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductSearchResponseDto"
+      summary: Get products
+      tags: *a1
+  /products/{uuid}:
+    get:
+      description: Get a single product. A valid uuid must be used.
+      operationId: findOne
+      parameters:
+        - name: uuid
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductWithoutOrdersDto"
+      summary: Get a product
+      tags: *a1
+    patch:
+      description: Update a single product. A valid uuid must be used. Auth is required.
+      operationId: update
+      parameters:
+        - name: uuid
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProductDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductWithoutOrdersDto"
+      security:
+        - bearer: []
+      summary: Update a product
+      tags: *a1
+    delete:
+      description: Delete a single product. A valid uuid must be used. Auth is required.
+      operationId: remove
+      parameters:
+        - name: uuid
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductWithoutOrdersDto"
+      security:
+        - bearer: []
+      summary: Delete a product
+      tags: *a1
+  /users:
+    post:
+      operationId: register
+      parameters: []
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+      tags: &a2
+        - Users
+    get:
+      operationId: findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+      tags: *a2
+  /users/{id}:
+    get:
+      operationId: findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *a2
+  /users/me:
+    get:
+      operationId: getMyProfile
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *a2
+    patch:
+      operationId: update
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *a2
+    delete:
+      operationId: remove
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a2
+  /carts:
+    get:
+      operationId: getCart
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCartDto"
+      tags: &a3
+        - Carts
+    put:
+      operationId: updateCart
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCartDto"
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCartDto"
+      tags: *a3
+    delete:
+      operationId: clear
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: boolean
+      tags: *a3
+  /orders:
+    post:
+      operationId: create
+      parameters: []
+      responses:
+        "201":
+          description: ""
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+      tags: &a4
+        - Orders
+    get:
+      operationId: search
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /orders/{uuid}:
+    get:
+      operationId: findOne
+      parameters:
+        - name: uuid
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+      tags: *a4
+    patch:
+      operationId: updateStatus
+      parameters:
+        - name: uuid
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrderDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+info:
+  title: Nexus API
+  description: The backend e-commerce API for Nexus store
+  version: "1.0"
+  contact: {}
+tags:
+  - name: nexus
+    description: ""
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    CreateProductDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+          minimum: 1
+        stock:
+          type: number
+          minimum: 1
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+      required:
+        - name
+        - description
+        - category
+        - price
+        - stock
+    ProductWithoutOrdersDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+      required:
+        - id
+        - name
+        - description
+        - category
+        - price
+        - stock
+        - images
+    ProductSearchResponseDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductWithoutOrdersDto"
+        page:
+          type: number
+        perPage:
+          type: number
+        count:
+          type: number
+        total:
+          type: number
+        totalPages:
+          type: number
+      required:
+        - data
+        - page
+        - perPage
+        - count
+        - total
+        - totalPages
+    UpdateProductDto:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+          minimum: 1
+        stock:
+          type: number
+          minimum: 1
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+        stock:
+          type: number
+        images:
+          type: array
+          items:
+            type: string
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderProduct"
+      required:
+        - id
+        - name
+        - description
+        - category
+        - price
+        - stock
+        - images
+        - orders
+    OrderProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        quantity:
+          type: number
+        priceAtTime:
+          type: number
+        order:
+          $ref: "#/components/schemas/Order"
+        product:
+          $ref: "#/components/schemas/Product"
+      required:
+        - id
+        - quantity
+        - priceAtTime
+        - order
+        - product
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        avatar:
+          type: string
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
+      required:
+        - id
+        - name
+        - email
+        - avatar
+        - orders
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: object
+        total:
+          type: number
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderProduct"
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - status
+        - total
+        - createdAt
+        - updatedAt
+        - products
+        - user
+    UpdateUserDto:
+      type: object
+      properties: {}
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        price:
+          type: number
+          minimum: 1
+        quantity:
+          type: number
+          minimum: 1
+        image:
+          type: string
+          format: uri
+      required:
+        - id
+        - name
+        - price
+        - quantity
+        - image
+    UpdateCartDto:
+      type: object
+      properties:
+        cart:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+      required:
+        - cart
+    UpdateOrderDto:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - cancelled
+            - completed
+      required:
+        - status
