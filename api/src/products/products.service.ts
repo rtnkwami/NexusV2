@@ -117,7 +117,12 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  remove(uuid: string) {
-    return this.productRepository.delete(uuid);
+  async remove(uuid: string) {
+    const product = await this.productRepository.findOneBy({ id: uuid });
+    if (!product) {
+      throw new NotFoundException('Product does not exist');
+    }
+    await this.productRepository.delete(uuid);
+    return product;
   }
 }
