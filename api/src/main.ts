@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import {
   DocumentBuilder,
   SwaggerDocumentOptions,
@@ -21,8 +21,6 @@ async function bootstrap() {
   app.enableCors({
     origin: 'http://localhost:3000',
   });
-
-  app.enableVersioning({ type: VersioningType.URI });
 
   const config = new DocumentBuilder()
     .setTitle('Nexus API')

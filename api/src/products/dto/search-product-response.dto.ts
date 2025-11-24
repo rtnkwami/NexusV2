@@ -5,7 +5,7 @@ export class ProductWithoutOrdersDto extends OmitType(Product, ['orders']) {}
 
 export class ProductSearchResponseDto {
   @ApiProperty({ type: [ProductWithoutOrdersDto] })
-  data: ProductWithoutOrdersDto[];
+  products: ProductWithoutOrdersDto[];
 
   @ApiProperty()
   page: number;

@@ -77,7 +77,7 @@ export class ProductsService {
     });
 
     return {
-      data: products,
+      products,
       page: currentPage,
       perPage: take,
       count: products.length,

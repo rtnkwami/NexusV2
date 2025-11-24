@@ -17,7 +17,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller({
   path: 'users',
-  version: '1',
 })
 @Auth('user')
 export class UsersController {

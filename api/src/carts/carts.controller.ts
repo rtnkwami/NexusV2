@@ -7,7 +7,6 @@ import type { DecodedIdToken } from 'firebase-admin/auth';
 
 @Controller({
   path: 'carts',
-  version: '1',
 })
 @Auth()
 export class CartsController {
