@@ -9,11 +9,11 @@
     "generate:sdk": "pnpm openapi-ts -i ./api/openapi.yaml -o ./sdk/src",
     "sync:sdk": "pnpm generate:openapi && pnpm generate:sdk",
     "dev:api": "pnpm --filter @nexus/api start:dev",
-    "dev:ui": "pnpm --filter @nexus/ui dev",
+    "dev:ui": "pnpm generate:sdk && pnpm --filter @nexus/ui dev",
     "prod:api": "pnpm --filter @nexus/api start:prod",
     "prod:ui": "pnpm --filter @nexus/ui start",
     "build:api": "pnpm --filter @nexus/api build",
-    "build:ui": "pnpm --filter @nexus/ui build",
+    "build:ui": "pnpm generate:sdk && pnpm --filter @nexus/ui build",
     "build": "pnpm -r --parallel build",
     "clean": "rm -rf api/dist ui/.next"
     
