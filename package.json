@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "packageManager": "pnpm@10.23.0",
   "scripts": {
-    "generate:openapi": "pnpm --filter @nexus/api openapi:generate",
+    "generate:openapi": "pnpm --filter @nexus/api generate:openapi",
     "openapi-ts": "openapi-ts",
     "generate:sdk": "pnpm openapi-ts -i ./api/openapi.yaml -o ./sdk/src",
     "sync:sdk": "pnpm generate:openapi && pnpm generate:sdk",

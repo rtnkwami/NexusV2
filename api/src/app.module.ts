@@ -24,6 +24,7 @@ import { OrdersModule } from './orders/orders.module';
         FIREBASE_PRIVATE_KEY: Joi.string().required(),
         FIREBASE_CLIENT_EMAIL: Joi.string().required(),
         REDIS_URL: Joi.string().uri(),
+        API_HOSTED_URL: Joi.string().uri(),
       }),
       validationOptions: {
         abortEarly: true,

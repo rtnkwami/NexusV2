@@ -143,10 +143,6 @@ paths:
       responses:
         "201":
           description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
       tags: &a2
         - Users
     get:
@@ -155,12 +151,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
       tags: *a2
   /users/{id}:
     get:
@@ -174,10 +164,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                type: object
       tags: *a2
   /users/me:
     get:
@@ -186,10 +172,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                type: object
       tags: *a2
     patch:
       operationId: update
@@ -203,10 +185,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                type: object
       tags: *a2
     delete:
       operationId: remove
@@ -222,10 +200,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateCartDto"
       tags: &a3
         - Carts
     put:
@@ -240,10 +214,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateCartDto"
       tags: *a3
     delete:
       operationId: clear
@@ -251,10 +221,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                type: boolean
       tags: *a3
   /orders:
     post:
@@ -263,10 +229,6 @@ paths:
       responses:
         "201":
           description: ""
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Order"
       tags: &a4
         - Orders
     get:
@@ -288,10 +250,6 @@ paths:
       responses:
         "200":
           description: ""
-          content:
-            application/json:
-              schema:
-                type: object
       tags: *a4
     patch:
       operationId: updateStatus
@@ -338,34 +296,6 @@ components:
           type: string
         price:
           type: number
-          minimum: 1
-        stock:
-          type: number
-          minimum: 1
-        images:
-          type: array
-          items:
-            type: string
-            format: uri
-      required:
-        - name
-        - description
-        - category
-        - price
-        - stock
-    ProductWithoutOrdersDto:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        category:
-          type: string
-        price:
-          type: number
         stock:
           type: number
         images:
@@ -373,17 +303,19 @@ components:
           items:
             type: string
       required:
-        - id
         - name
         - description
         - category
         - price
         - stock
         - images
+    ProductWithoutOrdersDto:
+      type: object
+      properties: {}
     ProductSearchResponseDto:
       type: object
       properties:
-        data:
+        products:
           type: array
           items:
             $ref: "#/components/schemas/ProductWithoutOrdersDto"
@@ -398,7 +330,7 @@ components:
         totalPages:
           type: number
       required:
-        - data
+        - products
         - page
         - perPage
         - count
@@ -415,159 +347,18 @@ components:
           type: string
         price:
           type: number
-          minimum: 1
-        stock:
-          type: number
-          minimum: 1
-        images:
-          type: array
-          items:
-            type: string
-            format: uri
-    Product:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        description:
-          type: string
-        category:
-          type: string
-        price:
-          type: number
         stock:
           type: number
         images:
           type: array
           items:
             type: string
-        orders:
-          type: array
-          items:
-            $ref: "#/components/schemas/OrderProduct"
-      required:
-        - id
-        - name
-        - description
-        - category
-        - price
-        - stock
-        - images
-        - orders
-    OrderProduct:
-      type: object
-      properties:
-        id:
-          type: string
-        quantity:
-          type: number
-        priceAtTime:
-          type: number
-        order:
-          $ref: "#/components/schemas/Order"
-        product:
-          $ref: "#/components/schemas/Product"
-      required:
-        - id
-        - quantity
-        - priceAtTime
-        - order
-        - product
-    User:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        email:
-          type: string
-        avatar:
-          type: string
-        orders:
-          type: array
-          items:
-            $ref: "#/components/schemas/Order"
-      required:
-        - id
-        - name
-        - email
-        - avatar
-        - orders
-    Order:
-      type: object
-      properties:
-        id:
-          type: string
-        status:
-          type: object
-        total:
-          type: number
-        createdAt:
-          format: date-time
-          type: string
-        updatedAt:
-          format: date-time
-          type: string
-        products:
-          type: array
-          items:
-            $ref: "#/components/schemas/OrderProduct"
-        user:
-          $ref: "#/components/schemas/User"
-      required:
-        - id
-        - status
-        - total
-        - createdAt
-        - updatedAt
-        - products
-        - user
     UpdateUserDto:
       type: object
       properties: {}
-    CartItem:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        price:
-          type: number
-          minimum: 1
-        quantity:
-          type: number
-          minimum: 1
-        image:
-          type: string
-          format: uri
-      required:
-        - id
-        - name
-        - price
-        - quantity
-        - image
     UpdateCartDto:
       type: object
-      properties:
-        cart:
-          type: array
-          items:
-            $ref: "#/components/schemas/CartItem"
-      required:
-        - cart
+      properties: {}
     UpdateOrderDto:
       type: object
-      properties:
-        status:
-          type: string
-          enum:
-            - pending
-            - cancelled
-            - completed
-      required:
-        - status
+      properties: {}
