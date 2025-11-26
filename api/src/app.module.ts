@@ -9,6 +9,7 @@ import { CartsModule } from './carts/carts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { OrdersModule } from './orders/orders.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -44,5 +45,6 @@ import { OrdersModule } from './orders/orders.module';
     CartsModule,
     OrdersModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
