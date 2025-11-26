@@ -1,5 +1,12 @@
 import { OrderProduct } from 'src/orders/entities/order-product.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class Product {
@@ -23,6 +30,12 @@ export class Product {
 
   @Column('json', { nullable: true })
   images: string[];
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
 
   @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.product)
   orders: OrderProduct[];
