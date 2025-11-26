@@ -22,7 +22,7 @@
     "migration:generate": "pnpm build && pnpm typeorm migration:generate -d dist/data-source.js",
     "migration:run": "pnpm build && pnpm typeorm migration:run -d dist/data-source.js",
     "migration:revert": "pnpm build && pnpm typeorm migration:revert -d dist/data-source.js",
-    "generate:openapi": "pnpm test:e2e openapi.e2e-spec.ts"
+    "generate:openapi": "jest --config ./test/jest-openapi.json openapi.e2e-spec.ts"
   },
   "dependencies": {
     "@keyv/redis": "^5.1.4",
