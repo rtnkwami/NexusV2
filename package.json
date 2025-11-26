@@ -6,6 +6,9 @@
   "scripts": {
     "generate:openapi": "pnpm --filter @nexus/api generate:openapi",
     "generate:sdk": "pnpm --filter @nexus/sdk openapi-ts",
+    "generate:migration": "pnpm --filter @nexus/api migration:generate",
+    "run:migration": "pnpm --filter @nexus/api migration:run",
+    "revert:migration": "pnpm --filter @nexus/api migration:revert",
     "sync:sdk": "pnpm generate:openapi && pnpm generate:sdk",
     "dev:api": "pnpm --filter @nexus/api start:dev",
     "dev:ui": "pnpm generate:sdk && pnpm --filter @nexus/ui dev",

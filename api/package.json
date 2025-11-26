@@ -19,9 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "pnpm build && pnpm typeorm migration:generate -- -d dist/data-source.js",
-    "migration:run": "pnpm build && pnpm typeorm migration:run -- -d dist/data-source.js",
-    "migration:revert": "pnpm build && pnpm typeorm migration:revert -- -d dist/data-source.js",
+    "migration:generate": "pnpm build && pnpm typeorm migration:generate -d dist/data-source.js",
+    "migration:run": "pnpm build && pnpm typeorm migration:run -d dist/data-source.js",
+    "migration:revert": "pnpm build && pnpm typeorm migration:revert -d dist/data-source.js",
     "generate:openapi": "pnpm test:e2e openapi.e2e-spec.ts"
   },
   "dependencies": {
