@@ -1,5 +1,12 @@
 import { Order } from 'src/orders/entities/order.entity';
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -14,6 +21,12 @@ export class User {
 
   @Column({ nullable: true })
   avatar: string;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
 
   @OneToMany(() => Order, (orders) => orders.user)
   orders: Order[];

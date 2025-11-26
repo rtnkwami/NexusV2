@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from 'src/products/entities/product.entity';
 
@@ -12,6 +19,12 @@ export class OrderProduct {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   priceAtTime: number;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
 
   @ManyToOne(() => Order, (order) => order.products)
   order: Order;

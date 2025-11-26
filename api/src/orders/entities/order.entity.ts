@@ -28,10 +28,10 @@ export class Order {
   @Column()
   total: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)

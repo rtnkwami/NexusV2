@@ -1,0 +1,12 @@
+packages:
+  - 'api'
+  - 'ui'
+  - 'sdk'
+
+onlyBuiltDependencies:
+  - '@firebase/util'
+  - '@nestjs/core'
+  - '@scarf/scarf'
+  - protobufjs
+  - sharp
+  - unrs-resolver

@@ -5,7 +5,9 @@ import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 
-@Controller('carts')
+@Controller({
+  path: 'carts',
+})
 @Auth()
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}

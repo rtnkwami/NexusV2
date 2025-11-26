@@ -1,0 +1,27 @@
+{
+  "name": "atelier",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.23.0",
+  "scripts": {
+    "generate:openapi": "pnpm --filter @nexus/api generate:openapi",
+    "generate:sdk": "pnpm --filter @nexus/sdk openapi-ts",
+    "generate:migration": "pnpm --filter @nexus/api migration:generate",
+    "run:migration": "pnpm --filter @nexus/api migration:run",
+    "revert:migration": "pnpm --filter @nexus/api migration:revert",
+    "sync:sdk": "pnpm generate:openapi && pnpm generate:sdk",
+    "dev:api": "pnpm --filter @nexus/api start:dev",
+    "dev:ui": "pnpm generate:sdk && pnpm --filter @nexus/ui dev",
+    "prod:api": "pnpm --filter @nexus/api start:prod",
+    "prod:ui": "pnpm --filter @nexus/ui start",
+    "build:api": "pnpm --filter @nexus/api build",
+    "build:ui": "pnpm generate:sdk && pnpm --filter @nexus/ui build",
+    "build": "pnpm -r --parallel build",
+    "clean": "rm -rf api/dist ui/.next",
+    "test:e2e:api": "pnpm --filter @nexus/api test:e2e"
+    
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.88.0"
+  }
+}

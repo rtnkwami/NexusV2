@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { CartsModule } from './carts/carts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
+import { OrdersModule } from './orders/orders.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -23,6 +25,7 @@ import KeyvRedis from '@keyv/redis';
         FIREBASE_PRIVATE_KEY: Joi.string().required(),
         FIREBASE_CLIENT_EMAIL: Joi.string().required(),
         REDIS_URL: Joi.string().uri(),
+        API_HOSTED_URL: Joi.string().uri(),
       }),
       validationOptions: {
         abortEarly: true,
@@ -40,6 +43,8 @@ import KeyvRedis from '@keyv/redis';
     ProductsModule,
     UsersModule,
     CartsModule,
+    OrdersModule,
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
