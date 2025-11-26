@@ -15,7 +15,6 @@ describe('OpenAPI (no external DB)', () => {
   beforeAll(async () => {
     const db = newDb();
 
-    // Register the version() function that TypeORM needs
     db.public.registerFunction({
       name: 'version',
       implementation: () => 'PostgreSQL 18.0',
@@ -28,7 +27,7 @@ describe('OpenAPI (no external DB)', () => {
 
     const ds: DataSource = await db.adapters.createTypeormDataSource({
       type: 'postgres',
-      autoLoadEntities: true,
+      entities: ['../src/**/*.entity{.ts,.js}'],
       synchronize: true,
     });
     await ds.initialize();
