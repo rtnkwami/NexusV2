@@ -5,7 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { writeFileSync } from 'fs';
 import YAML from 'yaml';
 
-import { AppModule } from '../src/app.module';
+import { AppModule } from '../../src/app.module';
 import { newDb } from 'pg-mem';
 import { DataSource } from 'typeorm';
 
