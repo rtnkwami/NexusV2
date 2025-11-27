@@ -31,7 +31,10 @@ import { AppController } from './app.controller';
         abortEarly: true,
       },
     }),
-    TypeOrmModule.forRoot(AppDataSource.options),
+    TypeOrmModule.forRoot({
+      ...AppDataSource.options,
+      autoLoadEntities: true,
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: () => {

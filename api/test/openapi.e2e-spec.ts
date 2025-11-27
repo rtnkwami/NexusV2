@@ -8,6 +8,7 @@ import YAML from 'yaml';
 import { newDb } from 'pg-mem';
 import { DataSource } from 'typeorm';
 import { AppModule } from 'src/app.module';
+import { beforeAll, afterAll, it, describe } from 'vitest';
 
 describe('OpenAPI (no external DB)', () => {
   let app: INestApplication;
