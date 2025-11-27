@@ -8,23 +8,11 @@ import {
 import { DataSource } from 'typeorm';
 import createTestApp from './utils/setup';
 import { beforeEach, afterAll, it, expect, describe, beforeAll } from 'vitest';
+import createFakeProduct from './utils/fakeProducts';
 
 describe('Products (e2e)', () => {
   let app: INestApplication<App>;
   let datasource: DataSource;
-
-  const testProduct = {
-    name: 'Premium Yoga Mat',
-    description:
-      'Extra thick 6mm non-slip yoga mat with alignment marks and carrying strap.',
-    category: 'Fitness',
-    price: 39.99,
-    stock: 120,
-    images: [
-      'https://example.com/images/yoga-mat-purple.jpg',
-      'https://example.com/images/yoga-mat-rolled.jpg',
-    ],
-  };
 
   beforeAll(async () => {
     ({ app, datasource } = await createTestApp());
@@ -40,14 +28,16 @@ describe('Products (e2e)', () => {
     });
 
     it('should create a product', async () => {
+      const product = createFakeProduct();
+
       const response = await request(app.getHttpServer())
         .post('/products')
-        .send(testProduct);
+        .send(product);
 
       const responseBody = response.body as ProductWithoutOrdersDto;
       expect(response.statusCode).toBe(201);
-      expect(responseBody.name).toEqual(testProduct.name);
-      expect(responseBody.description).toEqual(testProduct.description);
+      expect(responseBody.name).toEqual(product.name);
+      expect(responseBody.description).toEqual(product.description);
     });
 
     it('should throw a bad request error on missing product fields', async () => {
@@ -62,8 +52,10 @@ describe('Products (e2e)', () => {
     });
 
     describe('/products (GET)', () => {
+      let product: ReturnType<typeof createFakeProduct>;
       beforeEach(async () => {
-        await request(app.getHttpServer()).post('/products').send(testProduct);
+        product = createFakeProduct();
+        await request(app.getHttpServer()).post('/products').send(product);
       });
 
       it('should get a list of products', async () => {
@@ -72,7 +64,7 @@ describe('Products (e2e)', () => {
 
         const results = response.body as ProductSearchResponseDto;
         expect(results.products).not.toHaveLength(0);
-        expect(results.products[0].name).toEqual(testProduct.name);
+        expect(results.products[0].name).toEqual(product.name);
       });
 
       it('should throw a bad request error on invalid search params', async () => {
