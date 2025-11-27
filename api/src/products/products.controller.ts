@@ -25,6 +25,7 @@ import {
   ProductWithoutOrdersDto,
 } from './dto/search-product-response.dto';
 import { Auth } from 'src/auth/auth.decorator';
+import { SearchProductsQueryDto } from './dto/search-product.dto';
 
 @Controller({
   path: 'products',
@@ -59,26 +60,18 @@ export class ProductsController {
   ])
   @ApiResponse({ status: 200, type: ProductSearchResponseDto })
   @Get()
-  searchProducts(
-    @Query('q') q?: string,
-    @Query('minPrice') minPrice?: number,
-    @Query('maxPrice') maxPrice?: number,
-    @Query('minStock') minStock?: number,
-    @Query('maxStock') maxStock?: number,
-    @Query('page') page?: number,
-    @Query('limit') limit?: number,
-  ) {
+  searchProducts(@Query() query: SearchProductsQueryDto) {
     const filters: ProductSearchFilters = {
-      ...(q && { searchQuery: q }),
-      ...(minPrice !== undefined || maxPrice !== undefined
-        ? { price: { min: minPrice, max: maxPrice } }
+      ...(query.q && { searchQuery: query.q }),
+      ...(query.minPrice !== undefined || query.maxPrice !== undefined
+        ? { price: { min: query.minPrice, max: query.maxPrice } }
         : {}),
-      ...(minStock !== undefined || maxStock !== undefined
-        ? { stock: { min: minStock, max: maxStock } }
+      ...(query.minStock !== undefined || query.maxStock !== undefined
+        ? { stock: { min: query.minStock, max: query.maxStock } }
         : {}),
     };
 
-    return this.productsService.search(filters, page, limit);
+    return this.productsService.search(filters, query.page, query.limit);
   }
 
   @ApiOperation({
