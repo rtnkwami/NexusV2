@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderProduct } from './order-product.entity';
@@ -35,8 +36,8 @@ export class Order {
   updatedAt: Date;
 
   @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
-  products: OrderProduct[];
+  products: Relation<OrderProduct[]>;
 
   @ManyToOne(() => User, (user) => user.orders)
-  user: User;
+  user: Relation<User>;
 }

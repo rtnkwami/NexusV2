@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
@@ -27,8 +28,8 @@ export class OrderProduct {
   updatedAt: Date;
 
   @ManyToOne(() => Order, (order) => order.products)
-  order: Order;
+  order: Relation<Order>;
 
   @ManyToOne(() => Product, (product) => product)
-  product: Product;
+  product: Relation<Product>;
 }

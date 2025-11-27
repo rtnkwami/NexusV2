@@ -3,6 +3,8 @@
 /node_modules
 /build
 
+src/metadata.ts
+
 README.md
 
 # Logs
