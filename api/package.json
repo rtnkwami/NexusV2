@@ -22,7 +22,7 @@
     "migration:generate": "pnpm build && pnpm typeorm migration:generate -d dist/data-source.js",
     "migration:run": "pnpm build && pnpm typeorm migration:run -d dist/data-source.js",
     "migration:revert": "pnpm build && pnpm typeorm migration:revert -d dist/data-source.js",
-    "generate:openapi": "jest --config ./test/jest-openapi.json openapi.e2e-spec.ts"
+    "generate:openapi": "vitest run -c ./vitest.openapi.config.ts"
   },
   "dependencies": {
     "@keyv/redis": "^5.1.4",
@@ -48,6 +48,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@faker-js/faker": "^10.1.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
