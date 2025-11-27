@@ -1,5 +1,27 @@
 openapi: 3.0.0
 paths:
+  /:
+    get:
+      description: Verifies that the API is healthy
+      operationId: health
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+      summary: API Health Check
+      tags:
+        - App
   /products:
     post:
       description: Create a product. Auth is required
