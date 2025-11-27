@@ -1,29 +1,16 @@
 import { INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
 import { App } from 'supertest/types';
 import request from 'supertest';
 import { ProductWithoutOrdersDto } from 'src/products/dto/search-product-response.dto';
 import { DataSource } from 'typeorm';
-import { AppModule } from 'src/app.module';
-import { FirebaseAuthGuard } from 'src/auth/auth.guard';
-import { BypassAuthGuard } from './overrides/auth.override';
+import createTestApp from './utils/setup';
 
 describe('Products (e2e)', () => {
   let app: INestApplication<App>;
   let datasource: DataSource;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideGuard(FirebaseAuthGuard)
-      .useClass(BypassAuthGuard)
-      .compile();
-
-    app = moduleFixture.createNestApplication();
-    await app.init();
-
-    datasource = app.get(DataSource);
+    ({ app, datasource } = await createTestApp());
   });
 
   afterAll(async () => {
@@ -31,7 +18,7 @@ describe('Products (e2e)', () => {
   });
 
   describe('/products (POST)', () => {
-    beforeEach(async () => {
+    beforeAll(async () => {
       await datasource.query('TRUNCATE TABLE product CASCADE;');
     });
 
@@ -58,5 +45,26 @@ describe('Products (e2e)', () => {
       expect(responseBody.name).toEqual(testProduct.name);
       expect(responseBody.description).toEqual(testProduct.description);
     });
+
+    it('should throw a bad request error on missing product fields', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/products')
+        .send({
+          name: 'Super Glue',
+          price: 3,
+        });
+
+      expect(response.statusCode).toBe(400);
+    });
   });
+
+  // describe('/products (GET)', () => {
+  //   beforeAll(async () => {
+
+  //   })
+
+  //   it('should return a paginated list of products', () => {
+
+  //   })
+  // })
 });
