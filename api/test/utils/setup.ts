@@ -20,6 +20,7 @@ export default async function createTestApp() {
       transform: true,
       stopAtFirstError: true,
       whitelist: true,
+      forbidNonWhitelisted: true,
     }),
   );
 
