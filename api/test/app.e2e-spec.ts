@@ -3,6 +3,7 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../src/app.module';
+import { beforeEach, afterAll, test, describe } from 'vitest';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;

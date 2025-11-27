@@ -7,6 +7,7 @@ import {
 } from 'src/products/dto/search-product-response.dto';
 import { DataSource } from 'typeorm';
 import createTestApp from './utils/setup';
+import { beforeEach, afterAll, it, expect, describe, beforeAll } from 'vitest';
 
 describe('Products (e2e)', () => {
   let app: INestApplication<App>;
