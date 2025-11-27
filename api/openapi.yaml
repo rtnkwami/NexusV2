@@ -1,6 +1,6 @@
 openapi: 3.0.0
 paths:
-  /:
+  /health:
     get:
       description: Verifies that the API is healthy
       operationId: health
@@ -78,11 +78,13 @@ paths:
           required: false
           in: query
           schema:
+            default: 1
             type: string
         - name: limit
           required: false
           in: query
           schema:
+            default: 20
             type: string
       responses:
         "200":
