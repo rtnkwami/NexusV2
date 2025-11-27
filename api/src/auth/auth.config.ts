@@ -1,5 +1,6 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
+import 'dotenv/config';
 
 const serviceAccount = {
   projectId: process.env.FIREBASE_PROJECT_ID,

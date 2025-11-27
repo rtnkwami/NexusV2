@@ -24,6 +24,7 @@ import {
   ProductSearchResponseDto,
   ProductWithoutOrdersDto,
 } from './dto/search-product-response.dto';
+import { Auth } from 'src/auth/auth.decorator';
 
 @Controller({
   path: 'products',
@@ -37,6 +38,7 @@ export class ProductsController {
     description: 'Create a product. Auth is required',
   })
   @ApiResponse({ status: 201, type: ProductWithoutOrdersDto })
+  @Auth()
   @Post()
   createProduct(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
@@ -97,6 +99,7 @@ export class ProductsController {
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @ApiBody({ required: false, type: UpdateProductDto })
+  @Auth()
   @Patch(':uuid')
   updateProduct(
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
@@ -112,6 +115,7 @@ export class ProductsController {
       'Delete a single product. A valid uuid must be used. Auth is required.',
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
+  @Auth()
   @Delete(':uuid')
   deleteProduct(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productsService.remove(uuid);
