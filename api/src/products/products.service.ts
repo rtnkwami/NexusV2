@@ -24,12 +24,16 @@ export class ProductsService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async create(createProductDto: CreateProductDto) {
+  async createProduct(createProductDto: CreateProductDto) {
     const product = this.productRepository.create(createProductDto);
     return await this.productRepository.save(product);
   }
 
-  async search(filters?: ProductSearchFilters, page?: number, limit?: number) {
+  async searchProducts(
+    filters?: ProductSearchFilters,
+    page?: number,
+    limit?: number,
+  ) {
     const take = limit ?? 20;
     const currentPage = page ?? 1;
     const skip = ((currentPage ?? 1) - 1) * take;
@@ -86,7 +90,7 @@ export class ProductsService {
     };
   }
 
-  async ensureSufficientStock(uuid: string, desiredQuantity: number) {
+  async ensureSufficientProductStock(uuid: string, desiredQuantity: number) {
     const product = await this.productRepository.findOneBy({ id: uuid });
     if (!product) {
       throw new NotFoundException('Product does not exist. Cannot be ordered');
@@ -100,7 +104,7 @@ export class ProductsService {
     }
   }
 
-  async findOne(uuid: string) {
+  async getProduct(uuid: string) {
     const product = await this.productRepository.findOneBy({ id: uuid });
     if (!product) {
       throw new NotFoundException('Product does not exist');
@@ -108,7 +112,7 @@ export class ProductsService {
     return product;
   }
 
-  async update(uuid: string, updateProductDto: UpdateProductDto) {
+  async updateProduct(uuid: string, updateProductDto: UpdateProductDto) {
     const product = await this.productRepository.findOneBy({ id: uuid });
     if (!product) {
       throw new NotFoundException('Product does not exist');
@@ -117,7 +121,7 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  async remove(uuid: string) {
+  async removeProduct(uuid: string) {
     const product = await this.productRepository.findOneBy({ id: uuid });
     if (!product) {
       throw new NotFoundException('Product does not exist');

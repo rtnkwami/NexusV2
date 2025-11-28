@@ -47,14 +47,14 @@ describe('ProductService', () => {
   };
 
   it('should create a product', async () => {
-    const product = await service.create(testProduct);
+    const product = await service.createProduct(testProduct);
     expect(product).not.toBeNull();
     expect(product.name).toBe(testProduct.name);
   });
 
   it('should get a product by id', async () => {
-    const product = await service.create(testProduct);
-    const newProduct = await service.findOne(product.id);
+    const product = await service.createProduct(testProduct);
+    const newProduct = await service.getProduct(product.id);
 
     expect(newProduct.id).toBe(newProduct.id);
   });

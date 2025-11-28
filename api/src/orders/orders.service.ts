@@ -35,7 +35,10 @@ export class OrdersService {
     }
 
     for (const item of data.cart) {
-      await this.productService.ensureSufficientStock(item.id, item.quantity);
+      await this.productService.ensureSufficientProductStock(
+        item.id,
+        item.quantity,
+      );
     }
 
     const newOrder = await this.dataSource.transaction(async (manager) => {
