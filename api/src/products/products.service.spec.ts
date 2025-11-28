@@ -90,6 +90,21 @@ describe('ProductService', () => {
     it('should filter by price range', async () => {
       const results = await service.searchProducts({ price: { min: 500, max: 1000 } });
       expect(results.total).not.toBe(0);
-    })
+    });
+
+    it('should filter by minimum stock', async () => {
+      const results = await service.searchProducts({ stock: { min: 50 } });
+      expect(results.total).not.toBe(0);
+    });
+
+    it('should filter by maximum stock', async () => {
+      const results = await service.searchProducts({ stock: { max: 70 } });
+      expect(results.total).not.toBe(0);
+    });
+
+    it('should filter by stock range', async () => {
+      const results = await service.searchProducts({ stock: { min: 50, max: 150 } });
+      expect(results.total).not.toBe(0);
+    });
   })
 });
