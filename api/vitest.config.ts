@@ -7,6 +7,37 @@ export default defineConfig({
     globals: true,
     root: './',
     exclude: [...defaultExclude, '**/dist/**'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          include: ['**/*.unit.spec.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'integration',
+          include: ['**/*.integration.spec.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'e2e',
+          include: ['**/*.e2e-spec.ts'],
+          exclude: ['./test/openapi.e2e-spec.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'openapi',
+          include: ['./test/openapi.e2e-spec.ts'],
+        },
+      },
+    ],
   },
   plugins: [
     // This is required to build the test files with SWC
