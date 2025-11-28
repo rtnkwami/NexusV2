@@ -19,7 +19,7 @@
     "build": "pnpm -r --parallel build",
     "clean": "rm -rf api/dist ui/.next",
     "test:api:e2e": "pnpm --filter @nexus/api test:e2e",
-    "test": "pnpm --filter @nexus/api test"
+    "test:api": "pnpm --filter @nexus/api test"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.88.0"
