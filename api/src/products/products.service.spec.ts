@@ -8,6 +8,7 @@ import { Product } from './entities/product.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { OrderProduct } from 'src/orders/entities/order-product.entity';
 import { User } from 'src/users/entities/user.entity';
+import createFakeProduct from 'test/utils/fakeProducts';
 
 describe('ProductService', () => {
   let service: ProductsService;
@@ -38,24 +39,26 @@ describe('ProductService', () => {
     await datasource.query('TRUNCATE TABLE product CASCADE;');
   });
 
-  const testProduct = {
-    name: 'Rice',
-    description: 'Grown in Africa',
-    price: 250.5,
-    category: 'Food',
-    stock: 100,
-  };
+  describe('basic CRUD operations', () => {
+    beforeEach(async () => {
+      await datasource.query('TRUNCATE product CASCADE')
+    })
 
-  it('should create a product', async () => {
-    const product = await service.createProduct(testProduct);
-    expect(product).not.toBeNull();
-    expect(product.name).toBe(testProduct.name);
-  });
+    it('should create a product', async () => {
+      const testProduct = createFakeProduct();
+      const product = await service.createProduct(testProduct);
+      
+      expect(product).not.toBeNull();
+      expect(product.name).toBe(testProduct.name);
+    });
+  
+    it('should get a product by id', async () => {
+      const testProduct = createFakeProduct();
 
-  it('should get a product by id', async () => {
-    const product = await service.createProduct(testProduct);
-    const newProduct = await service.getProduct(product.id);
-
-    expect(newProduct.id).toBe(newProduct.id);
-  });
+      const product = await service.createProduct(testProduct);
+      const newProduct = await service.getProduct(product.id);
+  
+      expect(newProduct.id).toBe(product.id);
+    });
+  })
 });
