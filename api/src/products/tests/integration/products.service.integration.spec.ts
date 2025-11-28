@@ -1,17 +1,17 @@
 import { it, expect, describe, beforeAll, beforeEach, afterAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsService } from './products.service';
+import { ProductsService } from '../../products.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppDataSource } from 'src/data-source';
 import { DataSource } from 'typeorm';
-import { Product } from './entities/product.entity';
+import { Product } from '../../entities/product.entity';
 import { Order } from 'src/orders/entities/order.entity';
 import { OrderProduct } from 'src/orders/entities/order-product.entity';
 import { User } from 'src/users/entities/user.entity';
 import createFakeProduct from 'test/utils/fakeProducts';
 import { NotFoundException } from '@nestjs/common';
 
-describe('ProductService', () => {
+describe('ProductService (Integration)', () => {
   let service: ProductsService;
   let datasource: DataSource;
 
@@ -38,8 +38,8 @@ describe('ProductService', () => {
 
   describe('basic CRUD operations', () => {
     beforeEach(async () => {
-      await datasource.query('TRUNCATE product CASCADE')
-    })
+      await datasource.query('TRUNCATE product CASCADE');
+    });
 
     it('should create a product', async () => {
       const testProduct = createFakeProduct();
@@ -48,26 +48,28 @@ describe('ProductService', () => {
       expect(product).not.toBeNull();
       expect(product.name).toBe(testProduct.name);
     });
-  
+
     it('should get a product by id', async () => {
       const testProduct = createFakeProduct();
       const product = await service.createProduct(testProduct);
       const createdProduct = await service.getProduct(product.id);
-  
+
       expect(createdProduct).toBeDefined();
       expect(createdProduct.name).toEqual(product.name);
     });
 
     it('should throw an error on getting a nonexistent product', async () => {
       await expect(
-        service.getProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'))
-        .rejects.toThrow(NotFoundException)
-    })
+        service.getProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'),
+      ).rejects.toThrow(NotFoundException);
+    });
 
     it('should update a product', async () => {
       const testProduct = createFakeProduct();
       const product = await service.createProduct(testProduct);
-      const updatedProduct = await service.updateProduct(product.id, { category: 'Test Category' });
+      const updatedProduct = await service.updateProduct(product.id, {
+        category: 'Test Category',
+      });
 
       expect(updatedProduct).toBeDefined();
       expect(updatedProduct.category).toBe('Test Category');
@@ -75,28 +77,28 @@ describe('ProductService', () => {
 
     it('should throw an error on updating a nonexistent product', async () => {
       await expect(
-        service.updateProduct(
-          '3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915', 
-          { category: 'Test Category' }
-        ))
-          .rejects.toThrow(NotFoundException)
-    })
+        service.updateProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915', {
+          category: 'Test Category',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
 
     it('should delete a product', async () => {
       const testProduct = createFakeProduct();
       const product = await service.createProduct(testProduct);
       await service.removeProduct(product.id);
 
-      await expect(service.getProduct(product.id)).rejects.toThrow(NotFoundException);
+      await expect(service.getProduct(product.id)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw an error on deleting a nonexistent product', async () => {
       await expect(
-        service.removeProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'))
-          .rejects.toThrow(NotFoundException)
-    })
+        service.removeProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'),
+      ).rejects.toThrow(NotFoundException);
+    });
   });
-
 
   describe('product search filtering', () => {
     beforeAll(async () => {
@@ -110,9 +112,7 @@ describe('ProductService', () => {
       const results = await service.searchProducts({ searchQuery: 'e' });
       expect(results.count).not.toBe(0);
       expect(
-        results.products.every(
-          (p) => p.name.toLowerCase().includes('e')
-        )
+        results.products.every((p) => p.name.toLowerCase().includes('e')),
       ).toBe(true);
     });
 
@@ -127,7 +127,9 @@ describe('ProductService', () => {
     });
 
     it('should filter by price range', async () => {
-      const results = await service.searchProducts({ price: { min: 500, max: 1000 } });
+      const results = await service.searchProducts({
+        price: { min: 500, max: 1000 },
+      });
       expect(results.total).not.toBe(0);
     });
 
@@ -142,13 +144,15 @@ describe('ProductService', () => {
     });
 
     it('should filter by stock range', async () => {
-      const results = await service.searchProducts({ stock: { min: 50, max: 150 } });
+      const results = await service.searchProducts({
+        stock: { min: 50, max: 150 },
+      });
       expect(results.total).not.toBe(0);
     });
 
     it('should filter by category', async () => {
       const results = await service.searchProducts({ category: 'Electronics' });
       expect(results.total).not.toBe(0);
-    })
-  })
+    });
+  });
 });
