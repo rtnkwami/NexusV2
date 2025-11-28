@@ -106,5 +106,10 @@ describe('ProductService', () => {
       const results = await service.searchProducts({ stock: { min: 50, max: 150 } });
       expect(results.total).not.toBe(0);
     });
+
+    it('should filter by category', async () => {
+      const results = await service.searchProducts({ category: 'Electronics' });
+      expect(results.total).not.toBe(0);
+    })
   })
 });

@@ -10,6 +10,11 @@ export class SearchProductsQueryDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @IsString()
+  category?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(0)

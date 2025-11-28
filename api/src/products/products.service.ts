@@ -40,9 +40,13 @@ export class ProductsService {
 
     const whereClause: FindOptionsWhere<Product> = {};
 
-    // Text search (name)
+    // Text search
     if (filters?.searchQuery) {
       whereClause.name = ILike(`%${filters.searchQuery}%`);
+    }
+
+    if (filters?.category) {
+      whereClause.category = ILike(`%${filters.category}%`);
     }
 
     // Price range
