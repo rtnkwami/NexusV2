@@ -9,6 +9,7 @@ import { Order } from 'src/orders/entities/order.entity';
 import { OrderProduct } from 'src/orders/entities/order-product.entity';
 import { User } from 'src/users/entities/user.entity';
 import createFakeProduct from 'test/utils/fakeProducts';
+import { NotFoundException } from '@nestjs/common';
 
 describe('ProductService', () => {
   let service: ProductsService;
@@ -57,13 +58,42 @@ describe('ProductService', () => {
       expect(createdProduct.name).toEqual(product.name);
     });
 
+    it('should throw an error on getting a nonexistent product', async () => {
+      await expect(
+        service.getProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'))
+        .rejects.toThrow(NotFoundException)
+    })
+
     it('should update a product', async () => {
       const testProduct = createFakeProduct();
       const product = await service.createProduct(testProduct);
       const updatedProduct = await service.updateProduct(product.id, { category: 'Test Category' });
 
       expect(updatedProduct).toBeDefined();
-      expect(updatedProduct.category).toBe('Test Category')
+      expect(updatedProduct.category).toBe('Test Category');
+    });
+
+    it('should throw an error on updating a nonexistent product', async () => {
+      await expect(
+        service.updateProduct(
+          '3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915', 
+          { category: 'Test Category' }
+        ))
+          .rejects.toThrow(NotFoundException)
+    })
+
+    it('should delete a product', async () => {
+      const testProduct = createFakeProduct();
+      const product = await service.createProduct(testProduct);
+      await service.removeProduct(product.id);
+
+      await expect(service.getProduct(product.id)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw an error on deleting a nonexistent product', async () => {
+      await expect(
+        service.removeProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'))
+          .rejects.toThrow(NotFoundException)
     })
   });
 
