@@ -17,6 +17,6 @@
     "@nexus/api": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^24.10.1"
+    "@types/node": "catalog:"
   }
 }
