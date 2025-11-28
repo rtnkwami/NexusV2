@@ -50,12 +50,21 @@ describe('ProductService', () => {
   
     it('should get a product by id', async () => {
       const testProduct = createFakeProduct();
-
       const product = await service.createProduct(testProduct);
-      const newProduct = await service.getProduct(product.id);
+      const createdProduct = await service.getProduct(product.id);
   
-      expect(newProduct.id).toBe(product.id);
+      expect(createdProduct).toBeDefined();
+      expect(createdProduct.name).toEqual(product.name);
     });
+
+    it('should update a product', async () => {
+      const testProduct = createFakeProduct();
+      const product = await service.createProduct(testProduct);
+      const updatedProduct = await service.updateProduct(product.id, { category: 'Test Category' });
+
+      expect(updatedProduct).toBeDefined();
+      expect(updatedProduct.category).toBe('Test Category')
+    })
   });
 
 
