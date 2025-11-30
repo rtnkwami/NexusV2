@@ -1,7 +1,7 @@
 import { OrderStatusType } from '../entities/order.entity';
 
 export type OrderSearchFilters = {
-  dateRange: { from: Date; to: Date };
-  status: OrderStatusType;
-  customer: string;
+  dateRange?: { from: string; to: string };
+  status?: OrderStatusType;
+  customer?: string;
 };
