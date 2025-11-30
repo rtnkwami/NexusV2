@@ -45,14 +45,8 @@ describe('OrdersService', () => {
       ],
       providers: [
         OrdersService,
-        {
-          provide: ProductsService,
-          useValue: vi.fn(),
-        },
-        {
-          provide: CartsService,
-          useValue: vi.fn(),
-        },
+        { provide: ProductsService, useValue: vi.fn() },
+        { provide: CartsService, useValue: vi.fn() },
       ],
     }).compile();
 
@@ -96,7 +90,6 @@ describe('OrdersService', () => {
         .find({ relations: ['products'] });
 
       expect(orders).not.toHaveLength(0);
-      console.log(orders[0].products);
       expect(orders[0].products).not.toHaveLength(0);
     });
   });

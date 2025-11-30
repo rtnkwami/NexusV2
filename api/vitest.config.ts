@@ -13,6 +13,9 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['**/*.unit.spec.ts'],
+          sequence: {
+            shuffle: true,
+          },
         },
       },
       {
@@ -20,6 +23,9 @@ export default defineConfig({
         test: {
           name: 'integration',
           include: ['**/*.integration.spec.ts'],
+          sequence: {
+            shuffle: true,
+          },
         },
       },
       {
