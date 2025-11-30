@@ -24,6 +24,7 @@ import {
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import { OrderStatus } from 'src/orders/dto/update-order.dto';
+import createFakeOrders from 'test/utils/fakeOrders';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -97,30 +98,15 @@ describe('OrdersService', () => {
   });
 
   describe('basic CRUD operations', () => {
-    beforeAll(async () => {
-      for (let i = 0; i < 20; i++) {
-        const testProduct = createFakeProduct();
-        datasource.getRepository(Product).create(testProduct);
-      }
-      const products = await datasource.getRepository(Product).find();
+    beforeEach(async () => {
+      await datasource.query('TRUNCATE "order" CASCADE');
 
-      for (let i = 0; i < 5; i++) {
-        // Randomly select products for each order
-        const randomProducts = faker.helpers.arrayElements(products, {
-          min: 2,
-          max: 5,
-        });
-
-        const testCart: CartItem[] = randomProducts.map((item) => ({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: faker.number.int({ min: 1, max: 10 }),
-          image: item.images[0],
-        }));
-
-        await service.orderTransaction(testCart);
-      }
+      await createFakeOrders({
+        service,
+        datasource,
+        productCount: 5,
+        orderCount: 3,
+      });
     });
 
     it('should get an order by id', async () => {
@@ -144,6 +130,32 @@ describe('OrdersService', () => {
 
       expect(orderToUpdate.status).toBe(OrderStatus.PENDING);
       expect(updatedOrder?.status).toBe(OrderStatus.COMPLETED);
+    });
+
+    describe('order search filtering', () => {
+      beforeAll(async () => {
+        await createFakeOrders({
+          service,
+          datasource,
+          productCount: 20,
+          orderCount: 30,
+        });
+      });
+
+      it('should filter by date range', async () => {
+        const now = new Date();
+        const yesterday = new Date(now.getDate() - 1);
+
+        const orders = await service.searchOrders({
+          dateRange: {
+            from: yesterday.toISOString(),
+            to: now.toISOString(),
+          },
+        });
+
+        console.log(orders.total);
+        expect(orders.total).toBeGreaterThan(0);
+      });
     });
   });
 });
