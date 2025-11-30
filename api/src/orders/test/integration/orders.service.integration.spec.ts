@@ -1,9 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CartItem, OrdersService } from '../../orders.service';
-import { describe, beforeAll, it, expect, vi, beforeEach } from 'vitest';
+import {
+  describe,
+  beforeAll,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  afterAll,
+} from 'vitest';
 import { DataSource } from 'typeorm';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppDataSource } from 'src/data-source';
 import { Product } from 'src/products/entities/product.entity';
 import { User } from 'src/users/entities/user.entity';
 import { OrderProduct } from '../../entities/order-product.entity';
@@ -12,16 +19,25 @@ import createFakeProduct, { FakeProduct } from 'test/utils/fakeProducts';
 import { faker } from '@faker-js/faker';
 import { ProductsService } from 'src/products/products.service';
 import { CartsService } from 'src/carts/carts.service';
+import {
+  PostgreSqlContainer,
+  StartedPostgreSqlContainer,
+} from '@testcontainers/postgresql';
 
 describe('OrdersService', () => {
   let service: OrdersService;
   let datasource: DataSource;
+  let testDb: StartedPostgreSqlContainer;
 
   beforeAll(async () => {
+    testDb = await new PostgreSqlContainer('postgres:18').start();
+    const connectionUri = testDb.getConnectionUri();
+
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         TypeOrmModule.forRoot({
-          ...AppDataSource.options,
+          type: 'postgres',
+          url: connectionUri,
           entities: [Product, Order, OrderProduct, User],
           synchronize: true,
         }),
@@ -44,11 +60,13 @@ describe('OrdersService', () => {
     datasource = module.get<DataSource>(DataSource);
   });
 
+  afterAll(async () => {
+    await datasource.destroy();
+    await testDb.stop();
+  });
+
   describe('Order Transaction', () => {
     beforeEach(async () => {
-      await datasource.query('TRUNCATE "order" CASCADE');
-      await datasource.query('TRUNCATE "product" CASCADE');
-
       const productsToOrder: FakeProduct[] = [];
       for (let i = 0; i < 6; i++) {
         const product = createFakeProduct();

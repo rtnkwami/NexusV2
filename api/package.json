@@ -56,6 +56,7 @@
     "@nestjs/testing": "catalog:",
     "@swc/cli": "catalog:",
     "@swc/core": "catalog:",
+    "@testcontainers/postgresql": "11.9.0",
     "@types/express": "catalog:",
     "@types/node": "catalog:",
     "@types/supertest": "catalog:",
