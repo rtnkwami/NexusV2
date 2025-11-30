@@ -133,7 +133,10 @@ export class OrdersService {
   }
 
   getOrder(uuid: string) {
-    return this.orderRepository.findOneBy({ id: uuid });
+    return this.orderRepository.findOne({
+      where: { id: uuid },
+      relations: ['products'],
+    });
   }
 
   updateOrderStatus(uuid: string, newStatus: OrderStatus) {

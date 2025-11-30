@@ -93,4 +93,42 @@ describe('OrdersService', () => {
       expect(orders[0].products).not.toHaveLength(0);
     });
   });
+
+  describe('basic CRUD operations', () => {
+    beforeAll(async () => {
+      for (let i = 0; i < 20; i++) {
+        const testProduct = createFakeProduct();
+        datasource.getRepository(Product).create(testProduct);
+      }
+      const products = await datasource.getRepository(Product).find();
+
+      for (let i = 0; i < 5; i++) {
+        // Randomly select products for each order
+        const randomProducts = faker.helpers.arrayElements(products, {
+          min: 2,
+          max: 5,
+        });
+
+        const testCart: CartItem[] = randomProducts.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: faker.number.int({ min: 1, max: 10 }),
+          image: item.images[0],
+        }));
+
+        await service.orderTransaction(testCart);
+      }
+    });
+
+    it('should get an order by id', async () => {
+      const orders = await datasource.getRepository(Order).find();
+      const order = await service.getOrder(orders[0].id);
+
+      expect(order).toBeDefined();
+      expect(order?.products).toBeDefined();
+      expect(order?.products.length).toBeGreaterThan(0);
+      expect(order?.products[0]).toHaveProperty('quantity');
+    });
+  });
 });
