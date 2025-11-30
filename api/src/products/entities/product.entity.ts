@@ -33,10 +33,10 @@ export class Product {
   images: string[];
 
   @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
+  createdAt: string;
 
   @UpdateDateColumn({ type: 'timestamptz' })
-  updatedAt: Date;
+  updatedAt: string;
 
   @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.product)
   orders: Relation<OrderProduct[]>;

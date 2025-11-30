@@ -24,10 +24,10 @@ export class User {
   avatar: string;
 
   @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
+  createdAt: string;
 
   @UpdateDateColumn({ type: 'timestamptz' })
-  updatedAt: Date;
+  updatedAt: string;
 
   @OneToMany(() => Order, (orders) => orders.user)
   orders: Relation<Order[]>;
