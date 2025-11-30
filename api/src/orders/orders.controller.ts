@@ -15,17 +15,17 @@ export class OrdersController {
   @Post()
   create(@CurrentUser() user: DecodedIdToken) {
     const cartKey = `cart-${user.sub}`;
-    return this.ordersService.create(cartKey);
+    return this.ordersService.placeOrder(cartKey);
   }
 
   @Get()
   search() {
-    return this.ordersService.search();
+    return this.ordersService.searchOrders();
   }
 
   @Get(':uuid')
   findOne(@Param('uuid') uuid: string) {
-    return this.ordersService.findOne(uuid);
+    return this.ordersService.getOrder(uuid);
   }
 
   @Patch(':uuid')
@@ -34,6 +34,6 @@ export class OrdersController {
     @Body() updateOrderDto: UpdateOrderDto,
   ) {
     const newStatus = updateOrderDto.status;
-    return this.ordersService.updateStatus(uuid, newStatus);
+    return this.ordersService.updateOrderStatus(uuid, newStatus);
   }
 }

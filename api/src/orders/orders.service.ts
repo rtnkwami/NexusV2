@@ -11,9 +11,17 @@ import {
 } from 'typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { ProductsService } from 'src/products/products.service';
-import { OrderProduct } from './entities/order-product.entity';
 import { Product } from 'src/products/entities/product.entity';
 import { OrderSearchFilters } from './types/order-search';
+import { OrderProduct } from './entities/order-product.entity';
+
+export type CartItem = {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+};
 
 @Injectable()
 export class OrdersService {
@@ -25,7 +33,44 @@ export class OrdersService {
     private dataSource: DataSource,
   ) {}
 
-  async create(cartKey: string) {
+  async orderTransaction(cart: CartItem[]) {
+    const order = await this.dataSource.transaction(async (manager) => {
+      const total = cart.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+
+      const newOrder = manager.create(Order, {
+        total,
+      });
+      await manager.save(newOrder);
+
+      await Promise.all(
+        cart.map(async (item) => {
+          await manager.decrement(
+            Product,
+            { id: item.id },
+            'stock',
+            item.quantity,
+          );
+
+          const orderProduct = manager.create(OrderProduct, {
+            quantity: item.quantity,
+            priceAtTime: item.price,
+            product: { id: item.id },
+            order: newOrder,
+            createdAt: newOrder.createdAt,
+          });
+
+          return manager.save(orderProduct);
+        }),
+      );
+      return newOrder;
+    });
+    return order;
+  }
+
+  async placeOrder(cartKey: string) {
     const data = await this.cartsService.getCart(cartKey);
 
     if (!data) {
@@ -33,46 +78,21 @@ export class OrdersService {
         'Cart is empty. No products to place an order',
       );
     }
-
     for (const item of data.cart) {
       await this.productService.ensureSufficientProductStock(
         item.id,
         item.quantity,
       );
     }
-
-    const newOrder = await this.dataSource.transaction(async (manager) => {
-      const total = data.cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
-      const order = manager.create(Order, {
-        total,
-      });
-      await manager.save(order);
-
-      for (const item of data.cart) {
-        const orderProduct = manager.create(OrderProduct, {
-          product: { id: item.id },
-          quantity: item.quantity,
-          priceAtTime: item.price,
-          order: { id: order.id },
-        });
-        await manager.save(orderProduct);
-        //
-        await manager.decrement(
-          Product,
-          { id: item.id },
-          'stock',
-          item.quantity,
-        );
-      }
-      return order;
-    });
+    const newOrder = await this.orderTransaction(data.cart);
     return newOrder;
   }
 
-  async search(filters?: OrderSearchFilters, page?: number, limit?: number) {
+  async searchOrders(
+    filters?: OrderSearchFilters,
+    page?: number,
+    limit?: number,
+  ) {
     const take = limit ?? 20;
     const currentPage = page ?? 1;
     const skip = ((currentPage ?? 1) - 1) * take;
@@ -112,11 +132,11 @@ export class OrdersService {
     };
   }
 
-  findOne(uuid: string) {
+  getOrder(uuid: string) {
     return this.orderRepository.findOneBy({ id: uuid });
   }
 
-  updateStatus(uuid: string, newStatus: OrderStatus) {
+  updateOrderStatus(uuid: string, newStatus: OrderStatus) {
     return this.orderRepository.update({ id: uuid }, { status: newStatus });
   }
 }
