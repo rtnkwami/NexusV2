@@ -139,7 +139,8 @@ export class OrdersService {
     });
   }
 
-  updateOrderStatus(uuid: string, newStatus: OrderStatus) {
-    return this.orderRepository.update({ id: uuid }, { status: newStatus });
+  async updateOrderStatus(uuid: string, newStatus: OrderStatus) {
+    await this.orderRepository.update({ id: uuid }, { status: newStatus });
+    return this.orderRepository.findOneBy({ id: uuid });
   }
 }

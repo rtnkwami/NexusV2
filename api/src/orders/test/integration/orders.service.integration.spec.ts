@@ -23,6 +23,7 @@ import {
   PostgreSqlContainer,
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
+import { OrderStatus } from 'src/orders/dto/update-order.dto';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -91,6 +92,7 @@ describe('OrdersService', () => {
 
       expect(orders).not.toHaveLength(0);
       expect(orders[0].products).not.toHaveLength(0);
+      expect(orders[0].status).toBe(OrderStatus.PENDING);
     });
   });
 
@@ -129,6 +131,19 @@ describe('OrdersService', () => {
       expect(order?.products).toBeDefined();
       expect(order?.products.length).toBeGreaterThan(0);
       expect(order?.products[0]).toHaveProperty('quantity');
+    });
+
+    it('should update the status of an order', async () => {
+      const orders = await datasource.getRepository(Order).find();
+      const orderToUpdate = orders[0];
+      await service.updateOrderStatus(orderToUpdate.id, OrderStatus.COMPLETED);
+
+      const updatedOrder = await datasource
+        .getRepository(Order)
+        .findOneBy({ id: orderToUpdate.id });
+
+      expect(orderToUpdate.status).toBe(OrderStatus.PENDING);
+      expect(updatedOrder?.status).toBe(OrderStatus.COMPLETED);
     });
   });
 });
