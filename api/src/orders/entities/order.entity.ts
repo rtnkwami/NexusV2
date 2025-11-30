@@ -26,7 +26,16 @@ export class Order {
   })
   status: OrderStatusType;
 
-  @Column()
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   total: number;
 
   @CreateDateColumn({ type: 'timestamptz' })
@@ -35,7 +44,9 @@ export class Order {
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order)
+  @OneToMany(() => OrderProduct, (orderProduct) => orderProduct.order, {
+    cascade: true,
+  })
   products: Relation<OrderProduct[]>;
 
   @ManyToOne(() => User, (user) => user.orders)

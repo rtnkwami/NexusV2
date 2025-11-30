@@ -18,7 +18,16 @@ export class OrderProduct {
   @Column()
   quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+    transformer: {
+      to: (value: number) => value,
+      from: (value: string) => parseFloat(value),
+    },
+  })
   priceAtTime: number;
 
   @CreateDateColumn({ type: 'timestamptz' })
