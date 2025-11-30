@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-type FakeProduct = {
+export type FakeProduct = {
   name: string;
   description: string;
   price: number;

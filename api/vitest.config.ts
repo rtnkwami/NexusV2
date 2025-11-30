@@ -20,6 +20,7 @@ export default defineConfig({
         test: {
           name: 'integration',
           include: ['**/*.integration.spec.ts'],
+          maxWorkers: 1,
         },
       },
       {
