@@ -123,7 +123,7 @@ export class OrdersService {
     });
 
     return {
-      data: orders,
+      orders,
       page: currentPage,
       perPage: take,
       count: orders.length,

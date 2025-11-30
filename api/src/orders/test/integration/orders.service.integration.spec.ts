@@ -142,19 +142,34 @@ describe('OrdersService', () => {
         });
       });
 
-      it('should filter by date range', async () => {
+      it('should filter orders by date range', async () => {
         const now = new Date();
         const yesterday = new Date(now.getDate() - 1);
 
-        const orders = await service.searchOrders({
+        const data = await service.searchOrders({
           dateRange: {
             from: yesterday.toISOString(),
             to: now.toISOString(),
           },
         });
 
-        console.log(orders.total);
-        expect(orders.total).toBeGreaterThan(0);
+        expect(data.total).toBeGreaterThan(0);
+      });
+
+      it('should filter orders by status', async () => {
+        const data = await service.searchOrders();
+        for (let i = 0; i < data.orders.length; i++) {
+          const order = data.orders[i];
+          await datasource
+            .getRepository(Order)
+            .update({ id: order.id }, { status: 'completed' });
+          i++;
+        }
+
+        const newData = await service.searchOrders({
+          status: OrderStatus.COMPLETED,
+        });
+        expect(newData.total).toBeGreaterThan(0);
       });
     });
   });
