@@ -16,8 +16,10 @@ import { ProductSearchFilters } from './types/product-search';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiForbiddenResponse,
   ApiOperation,
   ApiResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ApiOptionalQuery } from 'src/openapi-decorators/optional-query.decorator';
 import {
@@ -33,10 +35,28 @@ import { SearchProductsQueryDto } from './dto/search-product.dto';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create product',
     description: 'Create a product. Auth is required',
+  })
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authorization header',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 401 },
+        message: { type: 'string', example: 'Missing Authorization Header' },
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User has no role assigned or insufficient permissions',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 403 },
+        message: { type: 'string', example: 'Insufficient permissions' },
+      },
+    },
   })
   @ApiResponse({ status: 201, type: ProductWithoutOrdersDto })
   @Auth()
@@ -88,11 +108,29 @@ export class ProductsController {
     return this.productsService.getProduct(uuid);
   }
 
-  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Update a product',
     description:
       'Update a single product. A valid uuid must be used. Auth is required.',
+  })
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authorization header',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 401 },
+        message: { type: 'string', example: 'Missing Authorization Header' },
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User has no role assigned or insufficient permissions',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 403 },
+        message: { type: 'string', example: 'Insufficient permissions' },
+      },
+    },
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @ApiBody({ required: false, type: UpdateProductDto })
@@ -105,11 +143,29 @@ export class ProductsController {
     return this.productsService.updateProduct(uuid, updateProductDto);
   }
 
-  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete a product',
     description:
       'Delete a single product. A valid uuid must be used. Auth is required.',
+  })
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse({
+    description: 'Missing or invalid authorization header',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 401 },
+        message: { type: 'string', example: 'Missing Authorization Header' },
+      },
+    },
+  })
+  @ApiForbiddenResponse({
+    description: 'User has no role assigned or insufficient permissions',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 403 },
+        message: { type: 'string', example: 'Insufficient permissions' },
+      },
+    },
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @Auth()

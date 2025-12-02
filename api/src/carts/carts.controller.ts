@@ -4,12 +4,26 @@ import { UpdateCartDto } from './dto/update-cart.dto';
 import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import type { DecodedIdToken } from 'firebase-admin/auth';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+  description: 'Missing or invalid authorization header',
+  schema: {
+    properties: {
+      statusCode: { type: 'number', example: 401 },
+      message: { type: 'string', example: 'Missing Authorization Header' },
+    },
+  },
+})
 @Controller({
   path: 'carts',
 })
-@ApiBearerAuth()
 @Auth()
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}

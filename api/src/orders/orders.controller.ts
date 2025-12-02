@@ -4,7 +4,31 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import type { DecodedIdToken } from 'firebase-admin/auth';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@ApiUnauthorizedResponse({
+  description: 'Missing or invalid authorization header',
+  schema: {
+    properties: {
+      statusCode: { type: 'number', example: 401 },
+      message: { type: 'string', example: 'Missing Authorization Header' },
+    },
+  },
+})
+@ApiForbiddenResponse({
+  description: 'User has no role assigned or insufficient permissions',
+  schema: {
+    properties: {
+      statusCode: { type: 'number', example: 403 },
+      message: { type: 'string', example: 'Insufficient permissions' },
+    },
+  },
+})
 @Controller({
   path: 'orders',
 })

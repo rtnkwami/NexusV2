@@ -29,6 +29,16 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('nexus')
     .addBearerAuth()
+    .addGlobalResponse({
+      status: 500,
+      description: 'Internal server error',
+      schema: {
+        properties: {
+          statusCode: { type: 'number', example: 500 },
+          message: { type: 'string', example: 'Internal Server Error' },
+        },
+      },
+    })
     .build();
 
   const options: SwaggerDocumentOptions = {
