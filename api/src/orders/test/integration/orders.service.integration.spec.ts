@@ -145,7 +145,8 @@ describe('OrdersService', () => {
 
     it('should filter orders by date range', async () => {
       const now = new Date();
-      const yesterday = new Date(now.getDate() - 1);
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
 
       const data = await service.searchOrders({
         dateRange: {
