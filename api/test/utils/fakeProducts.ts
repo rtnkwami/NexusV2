@@ -22,7 +22,10 @@ export default function createFakeProduct(
   const product = {
     name: faker.commerce.product(),
     description: faker.commerce.productDescription(),
-    category: faker.commerce.department(),
+    category: faker.helpers.arrayElement([
+      'Electronics',
+      faker.commerce.department(),
+    ]),
     price: parseFloat(faker.commerce.price()),
     stock: faker.number.int({ min: 0, max: 200 }),
     images: imageArray,

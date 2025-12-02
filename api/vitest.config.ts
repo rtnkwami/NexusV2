@@ -14,7 +14,10 @@ export default defineConfig({
           name: 'unit',
           include: ['**/*.unit.spec.ts'],
           sequence: {
-            shuffle: true,
+            shuffle: {
+              tests: true,
+            },
+            concurrent: true,
           },
         },
       },
@@ -24,7 +27,10 @@ export default defineConfig({
           name: 'integration',
           include: ['**/*.integration.spec.ts'],
           sequence: {
-            shuffle: true,
+            shuffle: {
+              tests: true,
+            },
+            concurrent: true,
           },
         },
       },
