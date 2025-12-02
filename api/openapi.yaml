@@ -273,7 +273,7 @@ paths:
       tags: &a5
         - Users
     get:
-      operationId: findAll
+      operationId: searchUsers
       parameters: []
       responses:
         "200":
@@ -282,7 +282,7 @@ paths:
       tags: *a5
   /users/{id}:
     get:
-      operationId: findOne
+      operationId: getUser
       parameters:
         - name: id
           required: true
@@ -304,7 +304,7 @@ paths:
         "500": *a4
       tags: *a5
     patch:
-      operationId: update
+      operationId: updateMyProfile
       parameters: []
       requestBody:
         required: true
@@ -318,7 +318,7 @@ paths:
         "500": *a4
       tags: *a5
     delete:
-      operationId: remove
+      operationId: deleteMyAccount
       parameters: []
       responses:
         "200":
@@ -403,7 +403,7 @@ paths:
       tags: *a9
   /orders:
     post:
-      operationId: create
+      operationId: createOrder
       parameters: []
       responses:
         "201":
@@ -442,7 +442,7 @@ paths:
       tags: &a14
         - Orders
     get:
-      operationId: search
+      operationId: searchOrders
       parameters: []
       responses:
         "200":
@@ -454,7 +454,7 @@ paths:
       tags: *a14
   /orders/{uuid}:
     get:
-      operationId: findOne
+      operationId: getOrder
       parameters:
         - name: uuid
           required: true

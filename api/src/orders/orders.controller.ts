@@ -37,18 +37,18 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@CurrentUser() user: DecodedIdToken) {
+  createOrder(@CurrentUser() user: DecodedIdToken) {
     const cartKey = `cart-${user.sub}`;
     return this.ordersService.placeOrder(cartKey);
   }
 
   @Get()
-  search() {
+  searchOrders() {
     return this.ordersService.searchOrders();
   }
 
   @Get(':uuid')
-  findOne(@Param('uuid') uuid: string) {
+  getOrder(@Param('uuid') uuid: string) {
     return this.ordersService.getOrder(uuid);
   }
 

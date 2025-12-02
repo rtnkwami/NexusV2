@@ -29,13 +29,13 @@ export class UsersController {
 
   @Get()
   @Auth('admin')
-  findAll() {
+  searchUsers() {
     return this.usersService.findAll();
   }
 
   @Get(':id')
   @Auth('admin')
-  findOne(@Param('id') id: string) {
+  getUser(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
@@ -45,7 +45,7 @@ export class UsersController {
   }
 
   @Patch('me')
-  update(
+  updateMyProfile(
     @CurrentUser() user: DecodedIdToken,
     @Body() updateUserDto: UpdateUserDto,
   ) {
@@ -53,7 +53,7 @@ export class UsersController {
   }
 
   @Delete('me')
-  remove(@CurrentUser() user: DecodedIdToken) {
+  deleteMyAccount(@CurrentUser() user: DecodedIdToken) {
     return this.usersService.remove(user.sub);
   }
 }
