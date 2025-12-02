@@ -224,14 +224,23 @@ paths:
       tags: *a2
   /carts:
     get:
+      description: Get the items in your cart
       operationId: getCart
       parameters: []
       responses:
         "200":
           description: ""
-      tags: &a3
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCartDto"
+      security: &a3
+        - bearer: []
+      summary: Get your cart
+      tags: &a4
         - Carts
     put:
+      description: Update the items in your cart. Add or remove items in your cart
       operationId: updateCart
       parameters: []
       requestBody:
@@ -243,14 +252,31 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a3
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCartDto"
+      security: *a3
+      summary: Update your cart
+      tags: *a4
     delete:
+      description: "Removes all items from your cart. Note: Cart is automatically
+        cleared when an order is placed."
       operationId: clear
       parameters: []
       responses:
         "200":
           description: ""
-      tags: *a3
+          content:
+            application/json:
+              schema:
+                properties:
+                  cart:
+                    type: array
+                    example: []
+      security: *a3
+      summary: Clear your cart
+      tags: *a4
   /orders:
     post:
       operationId: create
@@ -258,7 +284,7 @@ paths:
       responses:
         "201":
           description: ""
-      tags: &a4
+      tags: &a5
         - Orders
     get:
       operationId: search
@@ -266,7 +292,7 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a4
+      tags: *a5
   /orders/{uuid}:
     get:
       operationId: findOne
@@ -279,7 +305,7 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a4
+      tags: *a5
     patch:
       operationId: updateStatus
       parameters:
@@ -297,7 +323,7 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a4
+      tags: *a5
 info:
   title: Nexus API
   description: The backend e-commerce API for Nexus store
@@ -417,9 +443,34 @@ components:
     UpdateUserDto:
       type: object
       properties: {}
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: number
+        quantity:
+          type: number
+        image:
+          type: string
+      required:
+        - id
+        - name
+        - price
+        - quantity
+        - image
     UpdateCartDto:
       type: object
-      properties: {}
+      properties:
+        cart:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+      required:
+        - cart
     UpdateOrderDto:
       type: object
       properties: {}
