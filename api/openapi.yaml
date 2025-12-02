@@ -19,6 +19,18 @@ paths:
                   timestamp:
                     type: string
                     format: date-time
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema: &a1
+                properties:
+                  statusCode:
+                    type: number
+                    example: 500
+                  message:
+                    type: string
+                    example: Internal Server Error
       summary: API Health Check
       tags:
         - App
@@ -40,10 +52,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductWithoutOrdersDto"
+        "401":
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 401
+                  message:
+                    type: string
+                    example: Missing Authorization Header
+        "403":
+          description: User has no role assigned or insufficient permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: string
+                    example: Insufficient permissions
+        "500": &a2
+          description: Internal server error
+          content:
+            application/json:
+              schema: *a1
       security:
         - bearer: []
       summary: Create product
-      tags: &a1
+      tags: &a3
         - Products
     get:
       description: Search for products given filters
@@ -98,8 +139,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductSearchResponseDto"
+        "500": *a2
       summary: Get products
-      tags: *a1
+      tags: *a3
   /products/{uuid}:
     get:
       description: Get a single product. A valid uuid must be used.
@@ -117,8 +159,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductWithoutOrdersDto"
+        "500": *a2
       summary: Get a product
-      tags: *a1
+      tags: *a3
     patch:
       description: Update a single product. A valid uuid must be used. Auth is required.
       operationId: updateProduct
@@ -141,10 +184,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductWithoutOrdersDto"
+        "401":
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 401
+                  message:
+                    type: string
+                    example: Missing Authorization Header
+        "403":
+          description: User has no role assigned or insufficient permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: string
+                    example: Insufficient permissions
+        "500": *a2
       security:
         - bearer: []
       summary: Update a product
-      tags: *a1
+      tags: *a3
     delete:
       description: Delete a single product. A valid uuid must be used. Auth is required.
       operationId: deleteProduct
@@ -161,10 +229,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductWithoutOrdersDto"
+        "401":
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 401
+                  message:
+                    type: string
+                    example: Missing Authorization Header
+        "403":
+          description: User has no role assigned or insufficient permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: string
+                    example: Insufficient permissions
+        "500": *a2
       security:
         - bearer: []
       summary: Delete a product
-      tags: *a1
+      tags: *a3
   /users:
     post:
       operationId: register
@@ -172,7 +265,12 @@ paths:
       responses:
         "201":
           description: ""
-      tags: &a2
+        "500": &a4
+          description: Internal server error
+          content:
+            application/json:
+              schema: *a1
+      tags: &a5
         - Users
     get:
       operationId: findAll
@@ -180,7 +278,8 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a2
+        "500": *a4
+      tags: *a5
   /users/{id}:
     get:
       operationId: findOne
@@ -193,7 +292,8 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a2
+        "500": *a4
+      tags: *a5
   /users/me:
     get:
       operationId: getMyProfile
@@ -201,7 +301,8 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a2
+        "500": *a4
+      tags: *a5
     patch:
       operationId: update
       parameters: []
@@ -214,14 +315,16 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a2
+        "500": *a4
+      tags: *a5
     delete:
       operationId: remove
       parameters: []
       responses:
         "200":
           description: ""
-      tags: *a2
+        "500": *a4
+      tags: *a5
   /carts:
     get:
       description: Get the items in your cart
@@ -234,10 +337,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateCartDto"
-      security: &a3
+        "401": &a6
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 401
+                  message:
+                    type: string
+                    example: Missing Authorization Header
+        "500": &a7
+          description: Internal server error
+          content:
+            application/json:
+              schema: *a1
+      security: &a8
         - bearer: []
       summary: Get your cart
-      tags: &a4
+      tags: &a9
         - Carts
     put:
       description: Update the items in your cart. Add or remove items in your cart
@@ -256,9 +376,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateCartDto"
-      security: *a3
+        "401": *a6
+        "500": *a7
+      security: *a8
       summary: Update your cart
-      tags: *a4
+      tags: *a9
     delete:
       description: "Removes all items from your cart. Note: Cart is automatically
         cleared when an order is placed."
@@ -274,9 +396,11 @@ paths:
                   cart:
                     type: array
                     example: []
-      security: *a3
+        "401": *a6
+        "500": *a7
+      security: *a8
       summary: Clear your cart
-      tags: *a4
+      tags: *a9
   /orders:
     post:
       operationId: create
@@ -284,7 +408,38 @@ paths:
       responses:
         "201":
           description: ""
-      tags: &a5
+        "401": &a10
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 401
+                  message:
+                    type: string
+                    example: Missing Authorization Header
+        "403": &a11
+          description: User has no role assigned or insufficient permissions
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 403
+                  message:
+                    type: string
+                    example: Insufficient permissions
+        "500": &a12
+          description: Internal server error
+          content:
+            application/json:
+              schema: *a1
+      security: &a13
+        - bearer: []
+      tags: &a14
         - Orders
     get:
       operationId: search
@@ -292,7 +447,11 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a5
+        "401": *a10
+        "403": *a11
+        "500": *a12
+      security: *a13
+      tags: *a14
   /orders/{uuid}:
     get:
       operationId: findOne
@@ -305,7 +464,11 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a5
+        "401": *a10
+        "403": *a11
+        "500": *a12
+      security: *a13
+      tags: *a14
     patch:
       operationId: updateStatus
       parameters:
@@ -323,7 +486,11 @@ paths:
       responses:
         "200":
           description: ""
-      tags: *a5
+        "401": *a10
+        "403": *a11
+        "500": *a12
+      security: *a13
+      tags: *a14
 info:
   title: Nexus API
   description: The backend e-commerce API for Nexus store
