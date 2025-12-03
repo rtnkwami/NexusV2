@@ -13,11 +13,15 @@ import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import type { DecodedIdToken } from 'firebase-admin/auth';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiForbiddenResponse,
+  ApiOperation,
+  ApiResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { OrdersSearchDto } from './dto/search-orders.dto';
+import { PlaceOrderResponseDto } from './dto/place-order-response.dto';
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({
@@ -45,6 +49,28 @@ import { OrdersSearchDto } from './dto/search-orders.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @ApiOperation({
+    summary: 'Create order from cart',
+    description:
+      "Places an order using items from the current user's cart. The cart will be processed and converted into an order.",
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Order successfully created',
+    type: PlaceOrderResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Cart is empty or invalid',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 400 },
+        message: {
+          type: 'string',
+          example: 'Cart is empty. No products to place an order',
+        },
+      },
+    },
+  })
   @Post('me')
   createOrder(@CurrentUser() user: DecodedIdToken) {
     const cartKey = `cart-${user.sub}`;

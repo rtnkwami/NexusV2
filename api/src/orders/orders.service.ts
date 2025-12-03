@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderStatus } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
@@ -69,7 +69,7 @@ export class OrdersService {
     const data = await this.cartsService.getCart(cartKey);
 
     if (!data) {
-      throw new NotFoundException(
+      throw new BadRequestException(
         'Cart is empty. No products to place an order',
       );
     }
