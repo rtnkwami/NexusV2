@@ -78,8 +78,8 @@ export class OrdersController {
   }
 
   @Get()
-  searchAllOrders() {
-    return this.ordersService.searchOrders();
+  searchAllOrders(@Query() query: OrdersSearchDto) {
+    return this.ordersService.searchOrders(query);
   }
 
   @Get('me')

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { OrderStatus } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
@@ -27,7 +31,10 @@ export class OrdersService {
     private dataSource: DataSource,
   ) {}
 
-  async orderTransaction(cart: CartItem[], userId: string) {
+  async orderTransaction(
+    cart: CartItem[],
+    userId: string,
+  ): Promise<{ orderId: string }> {
     const order = await this.dataSource.transaction(async (manager) => {
       const total = cart.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -65,7 +72,10 @@ export class OrdersService {
     return { orderId: order.id };
   }
 
-  async placeOrder(cartKey: string, userId: string) {
+  async placeOrder(
+    cartKey: string,
+    userId: string,
+  ): Promise<{ orderId: string }> {
     const data = await this.cartsService.getCart(cartKey);
 
     if (!data) {
@@ -88,7 +98,14 @@ export class OrdersService {
     userId?: string,
     page?: number,
     limit?: number,
-  ) {
+  ): Promise<{
+    orders: Order[];
+    page: number;
+    perPage: number;
+    count: number;
+    total: number;
+    totalPages: number;
+  }> {
     const take = limit ?? 20;
     const currentPage = page ?? 1;
     const skip = ((currentPage ?? 1) - 1) * take;
@@ -128,15 +145,27 @@ export class OrdersService {
     };
   }
 
-  getOrder(uuid: string) {
-    return this.orderRepository.findOne({
+  async getOrder(uuid: string): Promise<Order> {
+    const order = await this.orderRepository.findOne({
       where: { id: uuid },
       relations: ['products'],
     });
+
+    if (!order) {
+      throw new NotFoundException('Order does not exist');
+    }
+    return order;
   }
 
-  async updateOrderStatus(uuid: string, newStatus: OrderStatus) {
-    await this.orderRepository.update({ id: uuid }, { status: newStatus });
-    return this.orderRepository.findOneBy({ id: uuid });
+  async updateOrderStatus(
+    uuid: string,
+    newStatus: OrderStatus,
+  ): Promise<Order> {
+    const order = await this.orderRepository.findOneBy({ id: uuid });
+    if (!order) {
+      throw new NotFoundException('Order does not exist');
+    }
+    Object.assign(order, { status: newStatus });
+    return this.orderRepository.save(order);
   }
 }
