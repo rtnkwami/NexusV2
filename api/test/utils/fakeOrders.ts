@@ -3,6 +3,7 @@ import { CartItem, OrdersService } from 'src/orders/orders.service';
 import { DataSource } from 'typeorm';
 import createFakeProduct from './fakeProducts';
 import { Product } from 'src/products/entities/product.entity';
+import { User } from 'src/users/entities/user.entity';
 
 type Options = {
   service: OrdersService;
@@ -23,6 +24,13 @@ export default async function createFakeOrders({
     await datasource.getRepository(Product).save(product);
   }
   const products = await datasource.getRepository(Product).find();
+  const testUser = datasource.getRepository(User).create({
+    id: 'test-user-id',
+    name: 'John Doe',
+    email: 'john.doe@gmail.com',
+    avatar: 'https://johnspics.com/air.png',
+  });
+  await datasource.getRepository(User).save(testUser);
 
   for (let i = 0; i < orderCount; i++) {
     // Randomly select products for each order
@@ -39,6 +47,6 @@ export default async function createFakeOrders({
       image: item.images[0],
     }));
 
-    await service.orderTransaction(testCart);
+    await service.orderTransaction(testCart, testUser.id);
   }
 }

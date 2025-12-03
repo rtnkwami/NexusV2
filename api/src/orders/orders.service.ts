@@ -2,13 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { OrderStatus } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import {
-  Between,
-  DataSource,
-  FindOptionsWhere,
-  ILike,
-  Repository,
-} from 'typeorm';
+import { Between, DataSource, FindOptionsWhere, Repository } from 'typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { ProductsService } from 'src/products/products.service';
 import { Product } from 'src/products/entities/product.entity';
@@ -68,7 +62,6 @@ export class OrdersService {
       );
       return newOrder;
     });
-    console.log({ orderId: order.id });
     return { orderId: order.id };
   }
 
@@ -92,6 +85,7 @@ export class OrdersService {
 
   async searchOrders(
     filters?: OrderSearchFilters,
+    userId?: string,
     page?: number,
     limit?: number,
   ) {
@@ -101,9 +95,9 @@ export class OrdersService {
 
     const whereClause: FindOptionsWhere<Order> = {};
 
-    if (filters?.customer) {
+    if (userId) {
       whereClause.user = {
-        name: ILike(`%${filters.customer}%`),
+        id: userId,
       };
     }
 

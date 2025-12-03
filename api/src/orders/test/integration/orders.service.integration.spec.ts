@@ -128,6 +128,15 @@ describe('OrdersService', () => {
       expect(order?.products[0]).toHaveProperty('quantity');
     });
 
+    it("should get a specfic user's orders", async () => {
+      const users = await datasource.getRepository(User).find();
+      const testUser = users[0];
+      const userOrders = await service.searchOrders({}, testUser.id);
+
+      console.log(userOrders);
+      expect(userOrders.total).toBeGreaterThan(0);
+    });
+
     it('should update the status of an order', async () => {
       const orders = await datasource.getRepository(Order).find();
       const orderToUpdate = orders[0];
