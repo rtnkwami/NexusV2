@@ -17,6 +17,7 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOperation,
   ApiResponse,
   ApiUnauthorizedResponse,
@@ -103,6 +104,15 @@ export class ProductsController {
     description: 'Get a single product. A valid uuid must be used.',
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
+  @ApiNotFoundResponse({
+    description: 'Missing or invalid authorization header',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 404 },
+        message: { type: 'string', example: 'Product does not exist' },
+      },
+    },
+  })
   @Get(':uuid')
   getProduct(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.productsService.getProduct(uuid);
@@ -129,6 +139,15 @@ export class ProductsController {
       properties: {
         statusCode: { type: 'number', example: 403 },
         message: { type: 'string', example: 'Insufficient permissions' },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Missing or invalid authorization header',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 404 },
+        message: { type: 'string', example: 'Product does not exist' },
       },
     },
   })
@@ -164,6 +183,15 @@ export class ProductsController {
       properties: {
         statusCode: { type: 'number', example: 403 },
         message: { type: 'string', example: 'Insufficient permissions' },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Missing or invalid authorization header',
+    schema: {
+      properties: {
+        statusCode: { type: 'number', example: 404 },
+        message: { type: 'string', example: 'Product does not exist' },
       },
     },
   })

@@ -14,7 +14,9 @@ import type { DecodedIdToken } from 'firebase-admin/auth';
 import { Auth } from 'src/auth/auth.decorator';
 import { CurrentUser } from 'src/auth/user.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller({
   path: 'users',
 })
