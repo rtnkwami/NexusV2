@@ -39,7 +39,7 @@ export class OrdersController {
   @Post()
   createOrder(@CurrentUser() user: DecodedIdToken) {
     const cartKey = `cart-${user.sub}`;
-    return this.ordersService.placeOrder(cartKey);
+    return this.ordersService.placeOrder(cartKey, user.sub);
   }
 
   @Get()

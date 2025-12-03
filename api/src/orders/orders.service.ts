@@ -33,7 +33,7 @@ export class OrdersService {
     private dataSource: DataSource,
   ) {}
 
-  async orderTransaction(cart: CartItem[]) {
+  async orderTransaction(cart: CartItem[], userId: string) {
     const order = await this.dataSource.transaction(async (manager) => {
       const total = cart.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -42,6 +42,7 @@ export class OrdersService {
 
       const newOrder = manager.create(Order, {
         total,
+        user: { id: userId },
       });
       await manager.save(newOrder);
 
@@ -67,10 +68,11 @@ export class OrdersService {
       );
       return newOrder;
     });
-    return order;
+    console.log({ orderId: order.id });
+    return { orderId: order.id };
   }
 
-  async placeOrder(cartKey: string) {
+  async placeOrder(cartKey: string, userId: string) {
     const data = await this.cartsService.getCart(cartKey);
 
     if (!data) {
@@ -84,7 +86,7 @@ export class OrdersService {
         item.quantity,
       );
     }
-    const newOrder = await this.orderTransaction(data.cart);
+    const newOrder = await this.orderTransaction(data.cart, userId);
     return newOrder;
   }
 

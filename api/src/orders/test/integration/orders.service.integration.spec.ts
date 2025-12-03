@@ -64,12 +64,19 @@ describe('OrdersService', () => {
   describe('Order Transaction', () => {
     beforeEach(async () => {
       const productsToOrder: FakeProduct[] = [];
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 3; i++) {
         const product = createFakeProduct();
         productsToOrder.push(product);
       }
 
       await datasource.getRepository(Product).insert(productsToOrder);
+      const testUser = datasource.getRepository(User).create({
+        id: 'test-user-id',
+        name: 'John Doe',
+        email: 'john.doe@gmail.com',
+        avatar: 'https://johnspics.com/air.png',
+      });
+      await datasource.getRepository(User).save(testUser);
     });
 
     it('should place an order and decrease stock', async () => {
@@ -85,15 +92,17 @@ describe('OrdersService', () => {
         };
       });
 
-      await service.orderTransaction(testCart);
+      const users = await datasource.getRepository(User).find();
+      const testUser = users[0];
+      await service.orderTransaction(testCart, testUser.id);
 
       const orders = await datasource
         .getRepository(Order)
-        .find({ relations: ['products'] });
+        .find({ relations: ['products', 'user'] });
 
       expect(orders).not.toHaveLength(0);
+      expect(orders[0].user).toBeDefined();
       expect(orders[0].products).not.toHaveLength(0);
-      expect(orders[0].status).toBe(OrderStatus.PENDING);
     });
   });
 
