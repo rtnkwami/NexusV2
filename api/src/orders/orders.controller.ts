@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Auth } from 'src/auth/auth.decorator';
@@ -9,6 +17,7 @@ import {
   ApiForbiddenResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { OrdersSearchDto } from './dto/search-orders.dto';
 
 @ApiBearerAuth()
 @ApiUnauthorizedResponse({
@@ -36,15 +45,23 @@ import {
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
-  @Post()
+  @Post('me')
   createOrder(@CurrentUser() user: DecodedIdToken) {
     const cartKey = `cart-${user.sub}`;
     return this.ordersService.placeOrder(cartKey, user.sub);
   }
 
   @Get()
-  searchOrders() {
+  searchAllOrders() {
     return this.ordersService.searchOrders();
+  }
+
+  @Get('me')
+  searchMyOrders(
+    @CurrentUser() user: DecodedIdToken,
+    @Query() query: OrdersSearchDto,
+  ) {
+    return this.ordersService.searchOrders(query, user.sub);
   }
 
   @Get(':uuid')

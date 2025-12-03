@@ -35,9 +35,9 @@ describe('OrdersService (Unit)', () => {
     it('should throw an error if cart is empty', async () => {
       vi.spyOn(cartService, 'getCart').mockResolvedValue(undefined);
 
-      await expect(service.placeOrder('test-cart-key')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.placeOrder('test-cart-key', 'test-user-id'),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
