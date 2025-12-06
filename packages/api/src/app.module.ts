@@ -15,7 +15,6 @@ import { AppController } from './app.controller';
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        PORT: Joi.number().port().default(3000),
         DATABASE_USER: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_NAME: Joi.string().required(),

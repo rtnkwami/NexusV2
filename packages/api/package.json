@@ -78,5 +78,6 @@
     "unplugin-swc": "catalog:",
     "vitest": "catalog:",
     "yaml": "catalog:"
-  }
+  },
+  "files": ["dist"]
 }
