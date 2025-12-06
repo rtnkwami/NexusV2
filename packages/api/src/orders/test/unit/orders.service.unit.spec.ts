@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CartsService } from 'src/carts/carts.service';
@@ -37,7 +37,7 @@ describe('OrdersService (Unit)', () => {
 
       await expect(
         service.placeOrder('test-cart-key', 'test-user-id'),
-      ).rejects.toThrow(NotFoundException);
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });
