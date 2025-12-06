@@ -133,7 +133,6 @@ describe('OrdersService', () => {
       const testUser = users[0];
       const userOrders = await service.searchOrders({}, testUser.id);
 
-      console.log(userOrders);
       expect(userOrders.total).toBeGreaterThan(0);
     });
 
