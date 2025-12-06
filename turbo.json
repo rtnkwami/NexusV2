@@ -4,8 +4,7 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [
-        ".next/**",
-        "!.next/cache/**",
+        ".nuxt",
         "dist/**"
       ]
     },

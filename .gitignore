@@ -33,6 +33,7 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+!.env.example
 
 # OS
 .DS_Store
@@ -54,18 +55,6 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# ============================================
-# API (NestJS)
-# ============================================
-
-# Compiled output
-dist
-build
-.turbo
-
-# API-specific
-packages/api/src/metadata.ts
-
 # Temp directories
 .temp
 .tmp
@@ -80,22 +69,34 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # ============================================
-# UI (Next.js + Vite)
+# API (NestJS)
 # ============================================
 
-# Next.js
-.next/
-out/
-next-env.d.ts
+# Compiled output
+dist
+build
+.turbo
 
-# TypeScript
-*.tsbuildinfo
-
-# Vercel
-.vercel
+# API-specific
+packages/api/src/metadata.ts
 
 # ============================================
-# SDK
+# WEB / UI (Nuxt)
 # ============================================
 
-packages/sdk/src/client
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Logs
+logs
+*.log
+
+# Misc
+.DS_Store
+.fleet
+.idea
