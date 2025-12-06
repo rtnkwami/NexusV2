@@ -85,3 +85,21 @@ jobs:
 
       - name: Run e2e tests
         run: pnpm test:api:e2e
+
+  build:
+    needs: [unit-integration-tests, e2e-tests]
+    runs-on: ubuntu-latest
+    name: Build Docker Images
+
+    strategy:
+      matrix:
+        build-type: [api]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build ${{ matrix.build-type }}
+        run: pnpm build:${{ matrix.build-type }}
+
+      - name: Build ${{ matrix.build-type }} container image
+        run: docker build . --target nexus-${{ matrix.build-type }} --tag nexus-${{ matrix.build-type }}:latest
