@@ -18,6 +18,8 @@
     "build:ui": "pnpm generate:sdk && pnpm --filter @nexus/ui build",
     "build": "pnpm -r --parallel build",
     "clean": "rm -rf packages/**/dist packages/**/.next",
+    "test:api:unit": "pnpm --filter @nexus/api test:unit",
+    "test:api:integration": "pnpm --filter @nexus/api test:integration",
     "test:api:e2e": "pnpm --filter @nexus/api test:e2e",
     "test:api": "pnpm --filter @nexus/api test"
   },
