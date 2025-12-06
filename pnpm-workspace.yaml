@@ -1,7 +1,5 @@
 packages:
-  - api
-  - ui
-  - sdk
+  - packages/*
 
 catalog:
   '@eslint/eslintrc': 3.2.0

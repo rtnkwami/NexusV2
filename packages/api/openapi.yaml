@@ -159,6 +159,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProductWithoutOrdersDto"
+        "404":
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Product does not exist
         "500": *a2
       summary: Get a product
       tags: *a3
@@ -208,6 +220,18 @@ paths:
                   message:
                     type: string
                     example: Insufficient permissions
+        "404":
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Product does not exist
         "500": *a2
       security:
         - bearer: []
@@ -253,6 +277,18 @@ paths:
                   message:
                     type: string
                     example: Insufficient permissions
+        "404":
+          description: Missing or invalid authorization header
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Product does not exist
         "500": *a2
       security:
         - bearer: []
@@ -270,7 +306,9 @@ paths:
           content:
             application/json:
               schema: *a1
-      tags: &a5
+      security: &a5
+        - bearer: []
+      tags: &a6
         - Users
     get:
       operationId: searchUsers
@@ -279,7 +317,8 @@ paths:
         "200":
           description: ""
         "500": *a4
-      tags: *a5
+      security: *a5
+      tags: *a6
   /users/{id}:
     get:
       operationId: getUser
@@ -293,7 +332,8 @@ paths:
         "200":
           description: ""
         "500": *a4
-      tags: *a5
+      security: *a5
+      tags: *a6
   /users/me:
     get:
       operationId: getMyProfile
@@ -302,7 +342,8 @@ paths:
         "200":
           description: ""
         "500": *a4
-      tags: *a5
+      security: *a5
+      tags: *a6
     patch:
       operationId: updateMyProfile
       parameters: []
@@ -316,7 +357,8 @@ paths:
         "200":
           description: ""
         "500": *a4
-      tags: *a5
+      security: *a5
+      tags: *a6
     delete:
       operationId: deleteMyAccount
       parameters: []
@@ -324,8 +366,9 @@ paths:
         "200":
           description: ""
         "500": *a4
-      tags: *a5
-  /carts:
+      security: *a5
+      tags: *a6
+  /carts/me:
     get:
       description: Get the items in your cart
       operationId: getCart
@@ -337,7 +380,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateCartDto"
-        "401": &a6
+        "401": &a7
           description: Missing or invalid authorization header
           content:
             application/json:
@@ -349,15 +392,15 @@ paths:
                   message:
                     type: string
                     example: Missing Authorization Header
-        "500": &a7
+        "500": &a8
           description: Internal server error
           content:
             application/json:
               schema: *a1
-      security: &a8
+      security: &a9
         - bearer: []
       summary: Get your cart
-      tags: &a9
+      tags: &a10
         - Carts
     put:
       description: Update the items in your cart. Add or remove items in your cart
@@ -376,11 +419,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateCartDto"
-        "401": *a6
-        "500": *a7
-      security: *a8
+        "401": *a7
+        "500": *a8
+      security: *a9
       summary: Update your cart
-      tags: *a9
+      tags: *a10
     delete:
       description: "Removes all items from your cart. Note: Cart is automatically
         cleared when an order is placed."
@@ -396,19 +439,37 @@ paths:
                   cart:
                     type: array
                     example: []
-        "401": *a6
-        "500": *a7
-      security: *a8
+        "401": *a7
+        "500": *a8
+      security: *a9
       summary: Clear your cart
-      tags: *a9
-  /orders:
+      tags: *a10
+  /orders/me:
     post:
+      description: Places an order using items from the current user's cart. The cart
+        will be processed and converted into an order.
       operationId: createOrder
       parameters: []
       responses:
         "201":
-          description: ""
-        "401": &a10
+          description: Order successfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaceOrderResponseDto"
+        "400":
+          description: Cart is empty or invalid
+          content:
+            application/json:
+              schema:
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: string
+                    example: Cart is empty. No products to place an order
+        "401": &a11
           description: Missing or invalid authorization header
           content:
             application/json:
@@ -420,7 +481,7 @@ paths:
                   message:
                     type: string
                     example: Missing Authorization Header
-        "403": &a11
+        "403": &a12
           description: User has no role assigned or insufficient permissions
           content:
             application/json:
@@ -432,26 +493,69 @@ paths:
                   message:
                     type: string
                     example: Insufficient permissions
-        "500": &a12
+        "500": &a13
           description: Internal server error
           content:
             application/json:
               schema: *a1
-      security: &a13
+      security: &a14
         - bearer: []
-      tags: &a14
+      summary: Create order from cart
+      tags: &a15
         - Orders
     get:
-      operationId: searchOrders
-      parameters: []
+      operationId: searchMyOrders
+      parameters:
+        - name: dateRange
+          required: false
+          in: query
+          schema:
+            $ref: "#/components/schemas/DateRangeDto"
+        - name: status
+          required: false
+          in: query
+          schema:
+            example: pending
+            type: string
+            enum:
+              - pending
+              - cancelled
+              - completed
       responses:
         "200":
           description: ""
-        "401": *a10
-        "403": *a11
-        "500": *a12
-      security: *a13
-      tags: *a14
+        "401": *a11
+        "403": *a12
+        "500": *a13
+      security: *a14
+      tags: *a15
+  /orders:
+    get:
+      operationId: searchAllOrders
+      parameters:
+        - name: dateRange
+          required: false
+          in: query
+          schema:
+            $ref: "#/components/schemas/DateRangeDto"
+        - name: status
+          required: false
+          in: query
+          schema:
+            example: pending
+            type: string
+            enum:
+              - pending
+              - cancelled
+              - completed
+      responses:
+        "200":
+          description: ""
+        "401": *a11
+        "403": *a12
+        "500": *a13
+      security: *a14
+      tags: *a15
   /orders/{uuid}:
     get:
       operationId: getOrder
@@ -464,11 +568,11 @@ paths:
       responses:
         "200":
           description: ""
-        "401": *a10
-        "403": *a11
-        "500": *a12
-      security: *a13
-      tags: *a14
+        "401": *a11
+        "403": *a12
+        "500": *a13
+      security: *a14
+      tags: *a15
     patch:
       operationId: updateStatus
       parameters:
@@ -486,11 +590,11 @@ paths:
       responses:
         "200":
           description: ""
-        "401": *a10
-        "403": *a11
-        "500": *a12
-      security: *a13
-      tags: *a14
+        "401": *a11
+        "403": *a12
+        "500": *a13
+      security: *a14
+      tags: *a15
 info:
   title: Nexus API
   description: The backend e-commerce API for Nexus store
@@ -638,6 +742,25 @@ components:
             $ref: "#/components/schemas/CartItem"
       required:
         - cart
+    PlaceOrderResponseDto:
+      type: object
+      properties:
+        orderId:
+          type: string
+      required:
+        - orderId
+    DateRangeDto:
+      type: object
+      properties:
+        from:
+          type: string
+          example: 2025-01-01
+        to:
+          type: string
+          example: 2025-12-31
+      required:
+        - from
+        - to
     UpdateOrderDto:
       type: object
       properties: {}
