@@ -24,6 +24,7 @@
     "test:api": "pnpm --filter @nexus/api test"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "catalog:"
+    "@hey-api/openapi-ts": "catalog:",
+    "turbo": "2.6.3"
   }
 }

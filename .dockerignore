@@ -1,7 +1,9 @@
 node_modules
-.env
+.env*
 openapi.yaml
 .gitignore
 dist
 *.md
 .git
+.github
+.turbo

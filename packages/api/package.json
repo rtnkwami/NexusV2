@@ -42,6 +42,7 @@
     "dotenv": "catalog:",
     "firebase-admin": "catalog:",
     "joi": "catalog:",
+    "keyv": "5.5.5",
     "pg": "catalog:",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
@@ -79,5 +80,7 @@
     "vitest": "catalog:",
     "yaml": "catalog:"
   },
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }

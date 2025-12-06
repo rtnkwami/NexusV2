@@ -61,6 +61,7 @@ lerna-debug.log*
 # Compiled output
 dist
 build
+.turbo
 
 # API-specific
 packages/api/src/metadata.ts
