@@ -9,7 +9,7 @@ on:
       - fix/*
 
 jobs:
-  tests:
+  unit-integration-tests:
     runs-on: ubuntu-latest
     name: Run ${{ matrix.test-type }} tests
     
@@ -37,3 +37,44 @@ jobs:
 
       - name: Run ${{ matrix.test-type }} tests
         run: pnpm test:api:${{ matrix.test-type }}
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    name: Run e2e tests
+
+    services:
+      postgres:
+        image: postgres:18
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: ${{ secrets.DATABASE_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}
+      redis:
+        image: redis:8.4.0
+        ports:
+          - 6379:6379
+    
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run e2e tests
+        env:
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+        run: pnpm test:api:e2e
