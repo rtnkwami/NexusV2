@@ -31,5 +31,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Pull test images
+        if: matrix.test-type == 'integration'
+        run: docker pull postgres:18
+
       - name: Run ${{ matrix.test-type }} tests
         run: pnpm test:api:${{ matrix.test-type }}
