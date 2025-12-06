@@ -33,7 +33,7 @@ jobs:
 
       - name: Pull test images
         if: matrix.test-type == 'integration'
-        run: docker pull postgres:18
+        run: docker pull postgres:18 && docker pull redis:8.4.0
 
       - name: Run ${{ matrix.test-type }} tests
         run: pnpm test:api:${{ matrix.test-type }}
