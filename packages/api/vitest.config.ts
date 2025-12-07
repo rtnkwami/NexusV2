@@ -41,7 +41,10 @@ export default defineConfig({
           include: ['**/*.e2e-spec.ts'],
           exclude: ['./test/openapi.e2e-spec.ts'],
           sequence: {
-            shuffle: true,
+            shuffle: {
+              files: true,
+              tests: true,
+            },
           },
           maxWorkers: 1,
         },

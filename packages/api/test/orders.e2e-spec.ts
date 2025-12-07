@@ -31,7 +31,7 @@ describe('Orders (e2e)', () => {
 
       const productsToOrder: FakeProduct[] = [];
       for (let i = 0; i < 10; i++) {
-        const product = createFakeProduct();
+        const product = createFakeProduct({ stock: 25 });
         productsToOrder.push(product);
       }
       await datasource.getRepository(Product).insert(productsToOrder);
