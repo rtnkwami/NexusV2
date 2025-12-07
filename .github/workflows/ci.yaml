@@ -101,5 +101,5 @@ jobs:
       - name: Build ${{ matrix.image-type }} docker image
         run: |
           docker build \
-            -t nexus-${{ matrix.image-type }}:${{ github.sha }} \
+            -t nexus-${{ matrix.image-type }}:${GITHUB_SHA::7} \
             -f packages/${{ matrix.image-type }}/Dockerfile .
