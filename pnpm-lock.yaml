@@ -5,154 +5,10 @@ settings:
   excludeLinksFromLockfile: false
   injectWorkspacePackages: true
 
-catalogs:
-  default:
-    '@eslint/eslintrc':
-      specifier: 3.2.0
-      version: 3.2.0
-    '@eslint/js':
-      specifier: 9.18.0
-      version: 9.18.0
-    '@faker-js/faker':
-      specifier: 10.1.0
-      version: 10.1.0
-    '@hey-api/openapi-ts':
-      specifier: 0.88.0
-      version: 0.88.0
-    '@keyv/redis':
-      specifier: 5.1.4
-      version: 5.1.4
-    '@nestjs/cache-manager':
-      specifier: 3.0.1
-      version: 3.0.1
-    '@nestjs/cli':
-      specifier: 11.0.0
-      version: 11.0.0
-    '@nestjs/common':
-      specifier: 11.0.1
-      version: 11.0.1
-    '@nestjs/config':
-      specifier: 4.0.2
-      version: 4.0.2
-    '@nestjs/core':
-      specifier: 11.0.1
-      version: 11.0.1
-    '@nestjs/mapped-types':
-      specifier: '*'
-      version: 2.1.0
-    '@nestjs/platform-express':
-      specifier: 11.0.1
-      version: 11.0.1
-    '@nestjs/schematics':
-      specifier: 11.0.0
-      version: 11.0.0
-    '@nestjs/swagger':
-      specifier: 11.2.3
-      version: 11.2.3
-    '@nestjs/testing':
-      specifier: 11.0.1
-      version: 11.0.1
-    '@nestjs/typeorm':
-      specifier: 11.0.0
-      version: 11.0.0
-    '@swc/cli':
-      specifier: 0.6.0
-      version: 0.6.0
-    '@swc/core':
-      specifier: 1.15.3
-      version: 1.15.3
-    '@types/express':
-      specifier: 5.0.5
-      version: 5.0.5
-    '@types/node':
-      specifier: 24.10.1
-      version: 24.10.1
-    '@types/supertest':
-      specifier: 6.0.2
-      version: 6.0.2
-    '@vitest/coverage-v8':
-      specifier: 4.0.14
-      version: 4.0.14
-    cache-manager:
-      specifier: 7.2.4
-      version: 7.2.4
-    class-transformer:
-      specifier: 0.5.1
-      version: 0.5.1
-    class-validator:
-      specifier: 0.14.2
-      version: 0.14.2
-    dotenv:
-      specifier: 17.2.3
-      version: 17.2.3
-    eslint-config-prettier:
-      specifier: 10.0.1
-      version: 10.0.1
-    eslint-plugin-prettier:
-      specifier: 5.2.2
-      version: 5.2.2
-    firebase-admin:
-      specifier: 13.6.0
-      version: 13.6.0
-    globals:
-      specifier: 16.0.0
-      version: 16.0.0
-    joi:
-      specifier: 18.0.1
-      version: 18.0.1
-    pg:
-      specifier: 8.16.3
-      version: 8.16.3
-    pg-mem:
-      specifier: 3.0.5
-      version: 3.0.5
-    prettier:
-      specifier: 3.4.2
-      version: 3.4.2
-    reflect-metadata:
-      specifier: 0.2.2
-      version: 0.2.2
-    rxjs:
-      specifier: 7.8.1
-      version: 7.8.1
-    source-map-support:
-      specifier: 0.5.21
-      version: 0.5.21
-    supertest:
-      specifier: 7.0.0
-      version: 7.0.0
-    ts-loader:
-      specifier: 9.5.2
-      version: 9.5.2
-    ts-node:
-      specifier: 10.9.2
-      version: 10.9.2
-    tsconfig-paths:
-      specifier: 4.2.0
-      version: 4.2.0
-    typeorm:
-      specifier: 0.3.27
-      version: 0.3.27
-    typescript-eslint:
-      specifier: 8.20.0
-      version: 8.20.0
-    unplugin-swc:
-      specifier: 1.5.9
-      version: 1.5.9
-    vitest:
-      specifier: 4.0.14
-      version: 4.0.14
-    yaml:
-      specifier: 2.8.1
-      version: 2.8.1
-
 importers:
 
   .:
     devDependencies:
-      '@hey-api/openapi-ts':
-        specifier: 'catalog:'
-        version: 0.88.0(magicast@0.5.1)(typescript@5.9.3)
       turbo:
         specifier: 2.6.3
         version: 2.6.3
@@ -821,23 +677,6 @@ packages:
   '@hapi/topo@6.0.2':
     resolution: {integrity: sha512-KR3rD5inZbGMrHmgPxsJ9dbi6zEK+C3ZwUwTa+eMwWLz7oijWUTWD2pMSNNYJAU6Qq+65NkxXjqHr/7LM2Xkqg==}
 
-  '@hey-api/codegen-core@0.3.3':
-    resolution: {integrity: sha512-vArVDtrvdzFewu1hnjUm4jX1NBITlSCeO81EdWq676MxQbyxsGcDPAgohaSA+Wvr4HjPSvsg2/1s2zYxUtXebg==}
-    engines: {node: '>=20.19.0'}
-    peerDependencies:
-      typescript: '>=5.5.3'
-
-  '@hey-api/json-schema-ref-parser@1.2.1':
-    resolution: {integrity: sha512-inPeksRLq+j3ArnuGOzQPQE//YrhezQG0+9Y9yizScBN2qatJ78fIByhEgKdNAbtguDCn4RPxmEhcrePwHxs4A==}
-    engines: {node: '>= 16'}
-
-  '@hey-api/openapi-ts@0.88.0':
-    resolution: {integrity: sha512-ZrvmDfmVf+N4ry786LAhS/DoH+xkIjIJIeDnj2aL1qnMTIDsdRIXXvr80EnAZVBgunzu1wTBbHb3H9OfyDQ2EQ==}
-    engines: {node: '>=20.19.0'}
-    hasBin: true
-    peerDependencies:
-      typescript: '>=5.5.3'
-
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
     engines: {node: '>=18.18.0'}
@@ -1034,9 +873,6 @@ packages:
 
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
-
-  '@jsdevtools/ono@7.1.3':
-    resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
   '@keyv/redis@5.1.4':
     resolution: {integrity: sha512-ZBt8imW+dRWOjJn9RTAglQdktXRYqkn8rmIB8vF/BwhEPt+OxQm7Jq706FKJFzM3Ykx9t/0jBE5CudU3SeGI5w==}
@@ -3003,10 +2839,6 @@ packages:
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
 
-  color-support@1.1.3:
-    resolution: {integrity: sha512-qiBjkpbMLO/HL68y+lh4q0/O1MZFj2RX6X/KmMa3+gJD3z+WwI1ZzDHysvqHGS3mP6mznPckpXmw1nI9cJjyRg==}
-    hasBin: true
-
   colord@2.9.3:
     resolution: {integrity: sha512-jeC1axXpnb0/2nn/Y1LPuLdgXBLH7aDcHu4KEKfqw3CUhX7ZpfBSlPKyqXE6btIgEzfWtrX3/tyBCaCvXvMkOw==}
 
@@ -3017,10 +2849,6 @@ packages:
   commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
     engines: {node: '>=16'}
-
-  commander@14.0.2:
-    resolution: {integrity: sha512-TywoWNNRbhoD0BXs1P3ZEScW8W5iKrnbithIl0YH+uCmBd0QpPOA8yc82DS3BIE5Ma6FnBVUsJ7wVUDz4dvOWQ==}
-    engines: {node: '>=20'}
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -4098,10 +3926,6 @@ packages:
     resolution: {integrity: sha512-xelSayHH36ZgE7ZWhli7pW34hNbNl8Ojv5KVmkJD4hBdD3th8Tfk9vYasLM+mXWOZhFkgZfxhLSnrwRr4elSSg==}
     engines: {node: '>=0.10.0'}
 
-  is-in-ssh@1.0.0:
-    resolution: {integrity: sha512-jYa6Q9rH90kR1vKB6NM7qqd1mge3Fx4Dhw5TVlK1MUBqhEOuCagrEHMevNuCcbECmXZ0ThXkRm+Ymr51HwEPAw==}
-    engines: {node: '>=20'}
-
   is-inside-container@1.0.0:
     resolution: {integrity: sha512-KIYLCCJghfHZxqjYBE7rEy0OBuTd5xCHS7tHVgvCLkx7StIoaxwNW3hCALgEUjFfeRk+MG/Qxmp/vtETEF3tRA==}
     engines: {node: '>=14.16'}
@@ -4879,10 +4703,6 @@ packages:
     resolution: {integrity: sha512-YgBpdJHPyQ2UE5x+hlSXcnejzAvD0b22U2OuAP+8OnlJT+PjWPxtgmGqKKc+RgTM63U9gN0YzrYc71R2WT/hTA==}
     engines: {node: '>=18'}
 
-  open@11.0.0:
-    resolution: {integrity: sha512-smsWv2LzFjP03xmvFoJ331ss6h+jixfA4UUV/Bsiyuu4YJPfN+FIQGOIiv4w9/+MoHkfkJ22UIaQWRVFRfH6Vw==}
-    engines: {node: '>=20'}
-
   open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
@@ -5295,10 +5115,6 @@ packages:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
 
-  powershell-utils@0.1.0:
-    resolution: {integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==}
-    engines: {node: '>=20'}
-
   prebuild-install@7.1.3:
     resolution: {integrity: sha512-8Mf2cbV7x1cXPUILADGI3wuhfqWvtiLA1iclTDbFRZkgRQS0NqsPZphna9V+HyTEadheuPmjaJMsbzKQFOzLug==}
     engines: {node: '>=10'}
@@ -5576,11 +5392,6 @@ packages:
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-
-  semver@7.7.2:
-    resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
-    engines: {node: '>=10'}
     hasBin: true
 
   semver@7.7.3:
@@ -6635,10 +6446,6 @@ packages:
     resolution: {integrity: sha512-h3Fbisa2nKGPxCpm89Hk33lBLsnaGBvctQopaBSOW/uIs6FTe1ATyAnKFJrzVs9vpGdsTe73WF3V4lIsk4Gacw==}
     engines: {node: '>=18'}
 
-  wsl-utils@0.3.0:
-    resolution: {integrity: sha512-3sFIGLiaDP7rTO4xh3g+b3AzhYDIUGGywE/WsmqzJWDxus5aJXVnPTNC/6L+r2WzrwXqVOdD262OaO+cEyPMSQ==}
-    engines: {node: '>=20'}
-
   xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
@@ -7237,31 +7044,6 @@ snapshots:
     dependencies:
       '@hapi/hoek': 11.0.7
 
-  '@hey-api/codegen-core@0.3.3(typescript@5.9.3)':
-    dependencies:
-      typescript: 5.9.3
-
-  '@hey-api/json-schema-ref-parser@1.2.1':
-    dependencies:
-      '@jsdevtools/ono': 7.1.3
-      '@types/json-schema': 7.0.15
-      js-yaml: 4.1.1
-      lodash: 4.17.21
-
-  '@hey-api/openapi-ts@0.88.0(magicast@0.5.1)(typescript@5.9.3)':
-    dependencies:
-      '@hey-api/codegen-core': 0.3.3(typescript@5.9.3)
-      '@hey-api/json-schema-ref-parser': 1.2.1
-      ansi-colors: 4.1.3
-      c12: 3.3.2(magicast@0.5.1)
-      color-support: 1.1.3
-      commander: 14.0.2
-      open: 11.0.0
-      semver: 7.7.2
-      typescript: 5.9.3
-    transitivePeerDependencies:
-      - magicast
-
   '@humanfs/core@0.19.1': {}
 
   '@humanfs/node@0.16.7':
@@ -7462,8 +7244,6 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.5
 
   '@js-sdsl/ordered-map@4.4.2': {}
-
-  '@jsdevtools/ono@7.1.3': {}
 
   '@keyv/redis@5.1.4(keyv@5.5.5)':
     dependencies:
@@ -9705,8 +9485,6 @@ snapshots:
 
   color-name@1.1.4: {}
 
-  color-support@1.1.3: {}
-
   colord@2.9.3: {}
 
   combined-stream@1.0.8:
@@ -9714,8 +9492,6 @@ snapshots:
       delayed-stream: 1.0.0
 
   commander@11.1.0: {}
-
-  commander@14.0.2: {}
 
   commander@2.20.3: {}
 
@@ -10905,8 +10681,6 @@ snapshots:
     dependencies:
       is-extglob: 2.1.1
 
-  is-in-ssh@1.0.0: {}
-
   is-inside-container@1.0.0:
     dependencies:
       is-docker: 3.0.0
@@ -11799,15 +11573,6 @@ snapshots:
       is-inside-container: 1.0.0
       wsl-utils: 0.1.0
 
-  open@11.0.0:
-    dependencies:
-      default-browser: 5.4.0
-      define-lazy-prop: 3.0.0
-      is-in-ssh: 1.0.0
-      is-inside-container: 1.0.0
-      powershell-utils: 0.1.0
-      wsl-utils: 0.3.0
-
   open@8.4.2:
     dependencies:
       define-lazy-prop: 2.0.0
@@ -12220,8 +11985,6 @@ snapshots:
     dependencies:
       xtend: 4.0.2
 
-  powershell-utils@0.1.0: {}
-
   prebuild-install@7.1.3:
     dependencies:
       detect-libc: 2.1.2
@@ -12540,8 +12303,6 @@ snapshots:
       semver: 7.7.3
 
   semver@6.3.1: {}
-
-  semver@7.7.2: {}
 
   semver@7.7.3: {}
 
@@ -13170,7 +12931,8 @@ snapshots:
 
   typescript@5.7.3: {}
 
-  typescript@5.9.3: {}
+  typescript@5.9.3:
+    optional: true
 
   ufo@1.6.1: {}
 
@@ -13615,11 +13377,6 @@ snapshots:
   wsl-utils@0.1.0:
     dependencies:
       is-wsl: 3.1.0
-
-  wsl-utils@0.3.0:
-    dependencies:
-      is-wsl: 3.1.0
-      powershell-utils: 0.1.0
 
   xtend@4.0.2: {}
 

@@ -28,11 +28,15 @@ COPY --from=prepare /app/out/full .
 
 RUN pnpm turbo build
 
+RUN pnpm deploy --filter=api --prod ./prod
+
 # Stage 4
 FROM node:24-alpine AS nexus-ui
 
-COPY --from=builder /app/packages/api/dist ./
+WORKDIR /app
+
+COPY --from=builder /app/prod .
 
 EXPOSE 5000
 
-CMD ["node", "main.js"]
+CMD ["node", "dist/main.js"]

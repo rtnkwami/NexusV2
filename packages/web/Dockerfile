@@ -28,13 +28,17 @@ COPY --from=prepare /app/out/full .
 
 RUN pnpm turbo build
 
+RUN pnpm deploy --filter=web ./prod
+
 # Stage 4
 FROM node:24-alpine AS nexus-ui
 
-COPY --from=builder /app/packages/web/.output ./
+WORKDIR /app
+
+COPY --from=builder /app/prod .
 
 EXPOSE 3000
 
 ENV NODE_ENV=production
 
-CMD ["node", "server/index.mjs"]
+CMD ["node", ".output/server/index.mjs"]
