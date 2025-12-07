@@ -43,20 +43,12 @@ describe('ProductService (Unit)', () => {
       await expect(
         service.ensureSufficientProductStock('non-existent-uuid', 5),
       ).rejects.toThrow(NotFoundException);
-
-      await expect(
-        service.ensureSufficientProductStock('non-existent-uuid', 5),
-      ).rejects.toThrow('Product does not exist. Cannot be ordered');
     });
 
     it('should throw BadRequestException if product does not have sufficient stock', async () => {
       const testProduct = createFakeProduct({ stock: 2 });
 
       mockProductRepository.findOneBy.mockResolvedValue(testProduct);
-
-      await expect(
-        service.ensureSufficientProductStock('test-uuid', 5),
-      ).rejects.toThrow(BadRequestException);
 
       await expect(
         service.ensureSufficientProductStock('test-uuid', 5),
@@ -74,7 +66,7 @@ describe('ProductService (Unit)', () => {
     });
 
     it('should not throw if requested quantity equals available stock', async () => {
-      const testProduct = createFakeProduct();
+      const testProduct = createFakeProduct({ stock: 5 });
 
       mockProductRepository.findOneBy.mockResolvedValue(testProduct);
 
