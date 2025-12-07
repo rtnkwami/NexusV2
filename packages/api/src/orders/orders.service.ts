@@ -34,6 +34,7 @@ export class OrdersService {
   async orderTransaction(
     cart: CartItem[],
     userId: string,
+    cartKey: string,
   ): Promise<{ orderId: string }> {
     const order = await this.dataSource.transaction(async (manager) => {
       const total = cart.reduce(
@@ -67,6 +68,7 @@ export class OrdersService {
           return manager.save(orderProduct);
         }),
       );
+      await this.cartsService.clearCart(cartKey);
       return newOrder;
     });
     return { orderId: order.id };
@@ -89,7 +91,7 @@ export class OrdersService {
         item.quantity,
       );
     }
-    const newOrder = await this.orderTransaction(data.cart, userId);
+    const newOrder = await this.orderTransaction(data.cart, userId, cartKey);
     return newOrder;
   }
 

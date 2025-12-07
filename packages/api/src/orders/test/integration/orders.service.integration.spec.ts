@@ -25,14 +25,20 @@ import {
 } from '@testcontainers/postgresql';
 import { OrderStatus } from 'src/orders/dto/update-order.dto';
 import createFakeOrders from 'test/utils/fakeOrders';
+import { RedisContainer, StartedRedisContainer } from '@testcontainers/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import KeyvRedis from '@keyv/redis';
 
 describe('OrdersService', () => {
   let service: OrdersService;
+  let cartService: CartsService;
   let datasource: DataSource;
   let testDb: StartedPostgreSqlContainer;
+  let testRedis: StartedRedisContainer;
 
   beforeAll(async () => {
     testDb = await new PostgreSqlContainer('postgres:18').start();
+    testRedis = await new RedisContainer('redis:8').start();
     const connectionUri = testDb.getConnectionUri();
 
     const module: TestingModule = await Test.createTestingModule({
@@ -44,16 +50,24 @@ describe('OrdersService', () => {
           synchronize: true,
         }),
         TypeOrmModule.forFeature([Product, Order, OrderProduct, User]),
+        CacheModule.registerAsync({
+          useFactory: () => {
+            return {
+              stores: [new KeyvRedis(testRedis.getConnectionUrl())],
+            };
+          },
+        }),
       ],
       providers: [
         OrdersService,
+        CartsService,
         { provide: ProductsService, useValue: vi.fn() },
-        { provide: CartsService, useValue: vi.fn() },
       ],
     }).compile();
 
     service = module.get<OrdersService>(OrdersService);
     datasource = module.get<DataSource>(DataSource);
+    cartService = module.get<CartsService>(CartsService);
   });
 
   afterAll(async () => {
@@ -62,7 +76,12 @@ describe('OrdersService', () => {
   });
 
   describe('Order Transaction', () => {
-    beforeEach(async () => {
+    const testCartKey = 'test-cart';
+    const testCartData: { cart: CartItem[] } = {
+      cart: [],
+    };
+
+    beforeAll(async () => {
       const productsToOrder: FakeProduct[] = [];
       for (let i = 0; i < 3; i++) {
         const product = createFakeProduct();
@@ -77,24 +96,35 @@ describe('OrdersService', () => {
         avatar: 'https://johnspics.com/air.png',
       });
       await datasource.getRepository(User).save(testUser);
-    });
 
-    it('should place an order and decrease stock', async () => {
       const products = await datasource.getRepository(Product).find();
 
-      const testCart: CartItem[] = products.map((item) => {
-        return {
+      products.forEach((item) => {
+        const cartItem = {
           id: item.id,
           name: item.name,
           price: item.price,
           quantity: faker.number.int({ min: 1, max: 10 }),
           image: item.images[0],
         };
+        testCartData.cart.push(cartItem);
       });
+      await cartService.updateCart(testCartKey, testCartData);
+    });
+
+    it('should place an order, decrease stock, and clear cart', async () => {
+      const cartBeforeOrder = await cartService.getCart(testCartKey);
+      expect(cartBeforeOrder).toBeDefined();
+      expect(cartBeforeOrder?.cart.length).toBeGreaterThan(0);
 
       const users = await datasource.getRepository(User).find();
       const testUser = users[0];
-      await service.orderTransaction(testCart, testUser.id);
+      await service.orderTransaction(
+        testCartData.cart,
+        testUser.id,
+        testCartKey,
+      );
+      const cartAfterOrder = await cartService.getCart(testCartKey);
 
       const orders = await datasource
         .getRepository(Order)
@@ -103,6 +133,7 @@ describe('OrdersService', () => {
       expect(orders).not.toHaveLength(0);
       expect(orders[0].user).toBeDefined();
       expect(orders[0].products).not.toHaveLength(0);
+      expect(cartAfterOrder).not.toBeDefined();
     });
   });
 
