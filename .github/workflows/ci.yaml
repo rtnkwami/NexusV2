@@ -99,4 +99,6 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build ${{ matrix.image-type }} docker image
-        run: docker build -f packages/${{ matrix.image-type }}/Dockerfile .
+        run: docker build \
+          -t nexus-${{ matrix.image-type }}:${{ github.sha }} \
+          -f packages/${{ matrix.image-type }}/Dockerfile .
