@@ -68,10 +68,6 @@ describe('Orders (e2e)', () => {
       const orderResponse = await apiRequest.post('/orders/me');
       expect(orderResponse.statusCode).toBe(201);
 
-      if (orderResponse.statusCode !== 201) {
-        console.log(orderResponse.error);
-      }
-
       const result = orderResponse.body as PlaceOrderResponseDto;
       expect(result.orderId).toBeDefined();
     });
