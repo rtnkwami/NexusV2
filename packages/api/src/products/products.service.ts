@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   BadRequestException,
   Injectable,
@@ -97,7 +98,7 @@ export class ProductsService {
   async ensureSufficientProductStock(uuid: string, desiredQuantity: number) {
     const product = await this.productRepository.findOneBy({ id: uuid });
     if (!product) {
-      throw new NotFoundException('Product does not exist. Cannot be ordered');
+      throw new NotFoundException(`Product ${ uuid } does not exist. Cannot be ordered`);
     }
 
     const currentStock = product.stock;
