@@ -1,4 +1,4 @@
-# Stage 1: Setup pnpm
+# Stage 1
 FROM node:24-alpine AS base
 
 ENV PNPM_HOME="/pnpm"
@@ -8,7 +8,7 @@ RUN corepack enable
 
 WORKDIR /app
 
-# Stage 2:
+# Stage 2
 FROM base AS prepare
 
 RUN pnpm add -g turbo@2
@@ -17,6 +17,7 @@ COPY . .
 
 RUN turbo prune web --docker
 
+# Stage 3
 FROM base AS builder
 
 COPY --from=prepare /app/out/json .
@@ -27,6 +28,7 @@ COPY --from=prepare /app/out/full .
 
 RUN pnpm turbo build
 
+# Stage 4
 FROM node:24-alpine AS nexus-ui
 
 COPY --from=builder /app/packages/web/.output ./
