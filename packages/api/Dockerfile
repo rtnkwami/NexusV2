@@ -22,7 +22,7 @@ FROM base AS builder
 
 COPY --from=prepare /app/out/json .
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY --from=prepare /app/out/full .
 
