@@ -7,6 +7,7 @@ on:
       - main
       - feat/*
       - fix/*
+      - test/*
 
 jobs:
   unit-integration-tests:
@@ -98,8 +99,40 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v5
 
+      - name: Cache turbo build setup
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Build production artifacts
+        run: scripts/build-api.sh
+
       - name: Build ${{ matrix.image-type }} docker image
         run: |
           docker build \
             -t nexus-${{ matrix.image-type }}:${GITHUB_SHA::7} \
             -f packages/${{ matrix.image-type }}/Dockerfile .
+
+      - name: Save Docker image to tar
+        run: docker save ${{ matrix.image-type }}:latest -o ${{ matrix.image-type }}-image.tar
+      
+      - name: Compress the image
+        run: gzip ${{ matrix.image-type }}-image.tar
+      
+      - name: Upload Docker image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image-${{ matrix.image-type }}
+          path: ${{ matrix.image-type }}-image.tar.gz
+          retention-days: 7
