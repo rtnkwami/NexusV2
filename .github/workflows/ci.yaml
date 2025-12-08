@@ -122,16 +122,18 @@ jobs:
         if: matrix.image-type == 'api'
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.image-type }}
-          path: api-build/prod/dist
+          name: ${{ matrix.image-type }}-build-artifact
+          path: api-build/prod
+          if-no-files-found: error
           retention-days: 7
 
       - name: Upload web build artifact
         if: matrix.image-type == 'web'
         uses: actions/upload-artifact@v4
         with:
-          name: build-${{ matrix.image-type }}
-          path: web-build/prod/.output
+          name: ${{ matrix.image-type }}-build-artifact
+          path: web-build/prod
+          if-no-files-found: error
           retention-days: 7
 
   build-images:
@@ -148,17 +150,17 @@ jobs:
 
       - name: Download api build artifact
         if: matrix.image-type == 'api'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
-          name: build-${{ matrix.image-type }}
-          path: api-build/prod/dist
+          name: ${{ matrix.image-type }}-build-artifact
+          path: api-build/prod
 
       - name: Download web build artifact
         if: matrix.image-type == 'web'
         uses: actions/download-artifact@v4
         with:
-          name: build-${{ matrix.image-type }}
-          path: web-build/prod/.output
+          name: ${{ matrix.image-type }}-build-artifact
+          path: web-build/prod
 
       - name: Build ${{ matrix.image-type }} docker image
         run: |
