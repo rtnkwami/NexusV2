@@ -146,11 +146,19 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v5
 
-      - name: Download build artifact
+      - name: Download api build artifact
+        if: matrix.image-type == 'api'
         uses: actions/download-artifact@v4
         with:
           name: build-${{ matrix.image-type }}
-          path: ${{ matrix.image-type == 'api' && 'api-build/prod/dist' || 'web-build/prod/.output' }}
+          path: api-build/prod/dist
+
+      - name: Download web build artifact
+        if: matrix.image-type == 'web'
+        uses: actions/download-artifact@v4
+        with:
+          name: build-${{ matrix.image-type }}
+          path: web-build/prod/.output
 
       - name: Build ${{ matrix.image-type }} docker image
         run: |
