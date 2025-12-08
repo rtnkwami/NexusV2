@@ -1,6 +1,4 @@
 # Root dir
-pnpm add -g turbo@2
-
 turbo prune web --docker
 
 # From root -> web-build dir
