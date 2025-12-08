@@ -1,4 +1,6 @@
 # Root dir
+pnpm add -g turbo@2
+
 turbo prune api --docker
 
 # From root -> api-build dir
