@@ -116,7 +116,7 @@ jobs:
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Build production artifacts
-        run: sudo bash scripts/build-${{ matrix.image-type }}.sh
+        run: bash scripts/build-${{ matrix.image-type }}.sh
 
       - name: Build ${{ matrix.image-type }} docker image
         run: |
