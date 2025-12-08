@@ -125,9 +125,9 @@ jobs:
             -f packages/${{ matrix.image-type }}/Dockerfile .
 
       - name: Save Docker image to tar
-        run: docker save ${{ matrix.image-type }}:latest -o ${{ matrix.image-type }}-image.tar
+        run: docker save nexus-${{ matrix.image-type }}:${GITHUB_SHA::7} -o ${{ matrix.image-type }}-image.tar
       
-      - name: Compress the image
+      - name: Compress Docker image
         run: gzip ${{ matrix.image-type }}-image.tar
       
       - name: Upload Docker image artifact
