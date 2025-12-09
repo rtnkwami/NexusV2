@@ -7,7 +7,6 @@ on:
       - main
       - feat/*
       - fix/*
-      - test/*
 
 jobs:
   unit-integration-tests:
@@ -87,8 +86,9 @@ jobs:
       - name: Run e2e tests
         run: pnpm test:api:e2e
 
-  build:
+  build_artifacts:
     needs: [unit-integration-tests, e2e-tests]
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
 
     strategy:
@@ -136,8 +136,9 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  build-images:
-    needs: build
+  docker_build:
+    needs: build_artifacts
+    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
 
     strategy:
