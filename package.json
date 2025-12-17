@@ -22,6 +22,6 @@
     "test:api": "pnpm --filter api test"
   },
   "devDependencies": {
-    "turbo": "catalog:"
+    "turbo": "2.6.3"
   }
 }
