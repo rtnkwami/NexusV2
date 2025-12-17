@@ -1,5 +1,7 @@
 name: CI Pipeline
 run-name: "CI Run for ${{ github.event.head_commit.message }}"
+permissions:
+  contents: read
 
 on:
   push:
