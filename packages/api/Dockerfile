@@ -25,7 +25,7 @@ WORKDIR /app
 
 COPY --from=builder /app/prod/dist ./dist
 COPY --from=builder /app/prod/node_modules ./node_modules
-COPY --from=builder /app/prod/package.json ./dist
+COPY --from=builder /app/prod/package.json ./pacakge.json
 
 EXPOSE 5000
 
