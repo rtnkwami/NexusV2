@@ -106,6 +106,7 @@ jobs:
         uses: dorny/paths-filter@v3
         id: changes
         with:
+          base: ${{ github.ref_name }}
           filters: |
             changed:
               - 'packages/${{ matrix.package }}/**'
