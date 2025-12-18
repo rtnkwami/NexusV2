@@ -17,13 +17,14 @@ COPY ./out/full ./
 
 RUN turbo build
 
-RUN pnpm deploy --filter=web ./prod
+RUN pnpm deploy --filter=web --prod ./prod
 
-FROM builder AS nexus-ui
+FROM node:24-alpine AS nexus-ui
 
 WORKDIR /app
 
-COPY --from=builder /app/prod ./
+COPY --from=builder /app/prod/.output ./.output
+COPY --from=builder /app/prod/package.json ./package.json
 
 EXPOSE 3000
 
