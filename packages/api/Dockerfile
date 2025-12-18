@@ -23,7 +23,9 @@ FROM builder AS nexus-api
 
 WORKDIR /app
 
-COPY --from=builder /app/prod ./
+COPY --from=builder /app/prod/dist ./dist
+COPY --from=builder /app/prod/node_modules ./node_modules
+COPY --from=builder /app/prod/package.json ./dist
 
 EXPOSE 5000
 
