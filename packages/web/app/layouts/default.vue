@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10
+    class="relative flex min-h-svh flex-col gap-6 p-6 md:p-10
            bg-[url('https://miro.medium.com/v2/1*FsJUFXiqszwqq9JrtlIDpQ.jpeg')] bg-cover bg-center"
   >
 

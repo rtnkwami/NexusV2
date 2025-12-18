@@ -3,6 +3,5 @@
 </script>
 
 <template>
-  <h1>Hello World</h1>
-  <p>this is me!</p>
+  <p>ho</p>
 </template>
