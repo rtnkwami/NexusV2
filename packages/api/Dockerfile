@@ -19,7 +19,7 @@ RUN turbo build
 
 RUN pnpm deploy --filter=api ./prod
 
-FROM builder AS nexus-api
+FROM node:24-alpine AS nexus-api
 
 WORKDIR /app
 
