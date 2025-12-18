@@ -28,5 +28,5 @@ COPY --from=builder /app/prod/node_modules ./node_modules
 COPY --from=builder /app/prod/package.json ./pacakge.json
 
 EXPOSE 5000
-
+# test
 CMD ["node", "dist/main.js"]
