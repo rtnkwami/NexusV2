@@ -88,14 +88,13 @@ jobs:
       - name: Run e2e tests
         run: pnpm test:api:e2e
 
-  build_artifacts:
+  build:
     needs: [unit-integration-tests, e2e-tests]
-    if: github.ref_name == 'main'
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        image-type: [api, web]
+        package: [api, web]
 
     steps:
       - name: Check out code
@@ -105,9 +104,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .turbo
-          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          key: ${{ runner.os }}-turbo-${{ matrix.package }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-turbo-
+            ${{ runner.os }}-turbo-${{ matrix.package }}-
 
       - uses: pnpm/action-setup@v4
 
@@ -117,56 +116,21 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Build production artifacts
-        run: bash scripts/build-${{ matrix.image-type }}.sh
-
-      - name: Upload api build artifact
-        if: matrix.image-type == 'api'
-        uses: actions/upload-artifact@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          name: ${{ matrix.image-type }}-build-artifact
-          path: api-build/prod
-          if-no-files-found: error
-          retention-days: 7
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Upload web build artifact
-        if: matrix.image-type == 'web'
-        uses: actions/upload-artifact@v4
+      - name: Prune packages
+        run: pnpm turbo prune ${{ matrix.package }} --docker
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
         with:
-          name: ${{ matrix.image-type }}-build-artifact
-          path: web-build/prod
-          if-no-files-found: error
-          retention-days: 7
-
-  docker_build:
-    needs: build_artifacts
-    if: github.ref_name == 'main'
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        image-type: [api, web]
-
-    steps:
-      - name: Check out code
-        uses: actions/checkout@v5
-
-      - name: Download api build artifact
-        if: matrix.image-type == 'api'
-        uses: actions/download-artifact@v5
-        with:
-          name: ${{ matrix.image-type }}-build-artifact
-          path: api-build/prod
-
-      - name: Download web build artifact
-        if: matrix.image-type == 'web'
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ matrix.image-type }}-build-artifact
-          path: web-build/prod
-
-      - name: Build ${{ matrix.image-type }} docker image
-        run: |
-          docker build \
-            -t nexus-${{ matrix.image-type }}:${GITHUB_SHA::7} \
-            -f packages/${{ matrix.image-type }}/Dockerfile .
+          context: .
+          file: packages/${{ matrix.package }}/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/nexus-${{ matrix.package }}:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/nexus-${{ matrix.package }}:latest
