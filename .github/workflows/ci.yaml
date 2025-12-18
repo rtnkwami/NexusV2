@@ -99,36 +99,57 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes
+        uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            changed:
+              - 'packages/${{ matrix.package }}/**'
+              - 'package.json'
+              - 'pnpm-workspace.yaml'
 
       - name: Cache turbo build setup
+        if: steps.changes.outputs.changed == 'true'
         uses: actions/cache@v4
         with:
           path: .turbo
-          key: ${{ runner.os }}-turbo-${{ matrix.package }}-${{ github.sha }}
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-turbo-${{ matrix.package }}-
+            ${{ runner.os }}-turbo-
 
-      - uses: pnpm/action-setup@v4
+      - name: Set up pnpm
+        if: steps.changes.outputs.changed == 'true'
+        uses: pnpm/action-setup@v4
 
-      - uses: actions/setup-node@v6
+      - name: Set up Node
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
+        if: steps.changes.outputs.changed == 'true'
         run: pnpm install
         
       - name: Prune packages
+        if: steps.changes.outputs.changed == 'true'
         run: pnpm turbo prune ${{ matrix.package }} --docker
 
       - name: Login to Docker Hub
+        if: steps.changes.outputs.changed == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
+        if: steps.changes.outputs.changed == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
