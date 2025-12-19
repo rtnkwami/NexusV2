@@ -10,6 +10,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 import { OrdersModule } from './orders/orders.module';
 import { AppController } from './app.controller';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AppController } from './app.controller';
         };
       },
     }),
+    LoggerModule.forRoot(),
     ProductsModule,
     UsersModule,
     CartsModule,
