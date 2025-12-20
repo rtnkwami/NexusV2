@@ -1,0 +1,62 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id            String            @id @default(uuid()) @db.Uuid
+  status        Order_Status_Enum @default(pending)
+  userId        String            @db.VarChar
+  createdAt     DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime          @default(now()) @db.Timestamptz(6)
+  total         Decimal           @db.Decimal(10, 2)
+  User          User              @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_caabe91507b3379c7ba73637b84")
+  Order_Product Order_Product[]
+}
+
+model Order_Product {
+  id          String   @id @default(uuid()) @db.Uuid
+  quantity    Int
+  priceAtTime Decimal  @db.Decimal(10, 2)
+  orderId     String   @db.Uuid
+  productId   String   @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @db.Timestamptz(6)
+  Product     Product  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_073c85ed133e05241040bd70f02")
+  Order       Order    @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3fb066240db56c9558a91139431")
+}
+
+model Product {
+  id            String          @id @default(uuid()) @db.Uuid
+  name          String          @db.VarChar
+  description   String?         @db.VarChar
+  category      String          @db.VarChar
+  price         Decimal         @db.Decimal(10, 2)
+  stock         Int
+  images        String[]
+  createdAt     DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime        @default(now()) @db.Timestamptz(6)
+  Order_Product Order_Product[]
+}
+
+model User {
+  id        String   @id @db.VarChar
+  name      String   @db.VarChar
+  email     String   @unique @db.VarChar
+  avatar    String?  @db.VarChar
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  Order     Order[]
+}
+
+enum Order_Status_Enum {
+  pending
+  cancelled
+  completed
+}
