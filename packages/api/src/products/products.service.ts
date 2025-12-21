@@ -17,85 +17,45 @@ export class ProductsService {
 
   async searchProducts(
     filters?: ProductSearchFilters,
-    page?: number,
-    limit?: number,
+    page: number = 1,
+    limit: number = 20,
   ) {
-    const take = limit ?? 20;
-    const currentPage = page ?? 1;
-    const skip = ((currentPage ?? 1) - 1) * take;
+    const skip = (page - 1) * limit;
 
-    const whereClause: Prisma.ProductWhereInput = {};
-
-    // Text search
-    if (filters?.searchQuery) {
-      whereClause.name = {
+    const where: Prisma.ProductWhereInput = {
+      name: filters?.searchQuery && {
         contains: filters.searchQuery,
         mode: 'insensitive',
-      };
-    }
+      },
 
-    if (filters?.category) {
-      whereClause.category = {
+      category: filters?.category && {
         contains: filters.category,
         mode: 'insensitive',
-      };
-    }
+      },
 
-    // Price range
-    if (filters?.price) {
-      const { min, max } = filters.price;
+      price: {
+        gte: filters?.price?.min,
+        lte: filters?.price?.max,
+      },
 
-      if (min != null && max != null) {
-        whereClause.price = {
-          gte: min,
-          lte: max,
-        };
-      } else if (min != null) {
-        whereClause.price = {
-          gte: min,
-        };
-      } else if (max != null) {
-        whereClause.price = {
-          lte: max,
-        };
-      }
-    }
-
-    // Stock range
-    if (filters?.stock) {
-      const { min, max } = filters.stock;
-
-      if (min != null && max != null) {
-        whereClause.stock = {
-          gte: min,
-          lte: max,
-        };
-      } else if (min != null) {
-        whereClause.stock = {
-          gte: min,
-        };
-      } else if (max != null) {
-        whereClause.stock = {
-          lte: max,
-        };
-      }
-    }
-
-    // If no filters were set, pass empty object (Prisma handles this correctly)
-    const where = Object.keys(whereClause).length > 0 ? whereClause : undefined;
+      stock: {
+        gte: filters?.stock?.min,
+        lte: filters?.stock?.max,
+      },
+    };
 
     const [products, totalItems] = await Promise.all([
-      this.prisma.product.findMany({ where, skip, take }),
+      this.prisma.product.findMany({ where, skip, take: limit }),
       this.prisma.product.count({ where }),
     ]);
 
     return {
       products,
-      page: currentPage,
-      perPage: take,
+      page,
+      perPage: limit,
       count: products.length,
       total: totalItems,
-      totalPages: Math.ceil(totalItems / take),
+      totalPages: Math.ceil(totalItems / limit),
     };
   }
 
