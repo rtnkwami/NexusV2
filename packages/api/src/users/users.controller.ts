@@ -32,13 +32,13 @@ export class UsersController {
   @Get()
   @Auth('admin')
   searchUsers() {
-    return this.usersService.findAll();
+    return this.usersService.searchUsers();
   }
 
   @Get(':id')
   @Auth('admin')
   getUser(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    return this.usersService.getUser(id);
   }
 
   @Get('me')
@@ -49,13 +49,13 @@ export class UsersController {
   @Patch('me')
   updateMyProfile(
     @CurrentUser() user: DecodedIdToken,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateData: UpdateUserDto,
   ) {
-    return this.usersService.update(user.sub, updateUserDto);
+    return this.usersService.updateUserProfile(user.sub, updateData);
   }
 
   @Delete('me')
   deleteMyAccount(@CurrentUser() user: DecodedIdToken) {
-    return this.usersService.remove(user.sub);
+    return this.usersService.deleteUser(user.sub);
   }
 }

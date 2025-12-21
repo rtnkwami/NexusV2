@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ProductsModule } from './products/products.module';
 import Joi from 'joi';
-// import { UsersModule } from './users/users.module';
-// import { CartsModule } from './carts/carts.module';
+import { UsersModule } from './users/users.module';
+import { CartsModule } from './carts/carts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
 // import { OrdersModule } from './orders/orders.module';
@@ -38,8 +38,8 @@ import { LoggerModule } from 'nestjs-pino';
     }),
     LoggerModule.forRoot(),
     ProductsModule,
-    // UsersModule,
-    // CartsModule,
+    UsersModule,
+    CartsModule,
     // OrdersModule,
   ],
   controllers: [AppController],
