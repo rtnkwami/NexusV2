@@ -1,38 +1,47 @@
 import { faker } from '@faker-js/faker';
 import { CartItem, OrdersService } from 'src/orders/orders.service';
-import { DataSource } from 'typeorm';
+import { CartsService } from 'src/carts/carts.service';
 import createFakeProduct from './fakeProducts';
-import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
+import { PrismaClient } from 'src/generated/prisma/client';
+import { randomUUID } from 'crypto';
 
 type Options = {
   service: OrdersService;
-  datasource: DataSource;
+  cartService: CartsService;
+  prisma: PrismaClient;
   productCount: number;
   orderCount: number;
 };
 
 export default async function createFakeOrders({
   service,
-  datasource,
+  cartService,
+  prisma,
   productCount,
   orderCount,
 }: Options) {
+  // Create products
   for (let i = 0; i <= productCount; i++) {
     const testProduct = createFakeProduct();
-    const product = datasource.getRepository(Product).create(testProduct);
-    await datasource.getRepository(Product).save(product);
+    await prisma.product.create({ data: testProduct });
   }
-  const products = await datasource.getRepository(Product).find();
-  const testUser = datasource.getRepository(User).create({
-    id: 'test-user-id',
-    name: 'John Doe',
-    email: 'john.doe@gmail.com',
-    avatar: 'https://johnspics.com/air.png',
-  });
-  await datasource.getRepository(User).save(testUser);
 
+  const products = await prisma.product.findMany();
+
+  // Create test user
+  const testUser = await prisma.user.create({
+    data: {
+      id: randomUUID(),
+      name: 'John Doe',
+      email: `john.doe-${randomUUID()}@gmail.com`,
+      avatar: 'https://johnspics.com/air.png',
+    },
+  });
+
+  // Create orders
   for (let i = 0; i < orderCount; i++) {
+    const cartKey = `test-cart-${i}`;
+
     // Randomly select products for each order
     const randomProducts = faker.helpers.arrayElements(products, {
       min: 2,
@@ -42,11 +51,15 @@ export default async function createFakeOrders({
     const testCart: CartItem[] = randomProducts.map((item) => ({
       id: item.id,
       name: item.name,
-      price: item.price,
+      price: item.price.toNumber(),
       quantity: faker.number.int({ min: 1, max: 10 }),
       image: item.images[0],
     }));
 
-    await service.orderTransaction(testCart, testUser.id);
+    // Store cart in cart service
+    await cartService.updateCart(cartKey, { cart: testCart });
+
+    // Create order using the cart key
+    await service.createOrder(testUser.id, cartKey);
   }
 }
