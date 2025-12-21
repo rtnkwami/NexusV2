@@ -26,6 +26,7 @@ export default defineConfig({
         test: {
           name: 'integration',
           include: ['**/*.integration.spec.ts'],
+          setupFiles: ['test/setup/setup.integration.ts'],
           sequence: {
             shuffle: {
               tests: true,
