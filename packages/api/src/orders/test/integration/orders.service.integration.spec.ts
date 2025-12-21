@@ -1,225 +1,258 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CartItem, OrdersService } from '../../orders.service';
-import {
-  describe,
-  beforeAll,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterAll,
-} from 'vitest';
-import { DataSource } from 'typeorm';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from 'src/products/entities/product.entity';
-import { User } from 'src/users/entities/user.entity';
-import { OrderProduct } from '../../entities/order-product.entity';
-import { Order } from '../../entities/order.entity';
-import createFakeProduct, { FakeProduct } from 'test/utils/fakeProducts';
-import { faker } from '@faker-js/faker';
-import { ProductsService } from 'src/products/products.service';
-import { CartsService } from 'src/carts/carts.service';
-import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
-import { OrderStatus } from 'src/orders/dto/update-order.dto';
-import createFakeOrders from 'test/utils/fakeOrders';
-import { RedisContainer, StartedRedisContainer } from '@testcontainers/redis';
+import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis from '@keyv/redis';
+import { faker } from '@faker-js/faker';
+import { randomUUID } from 'crypto';
+
+import { OrdersService } from 'src/orders/orders.service';
+import { CartsService } from 'src/carts/carts.service';
+import { ProductsService } from 'src/products/products.service';
+import { PrismaService } from 'src/prisma.service';
+import { OrderStatus } from 'src/orders/dto/update-order.dto';
+
+import { prisma } from 'test/setup/setup.integration';
+import createFakeProduct from 'test/utils/fakeProducts';
 
 describe('OrdersService', () => {
   let service: OrdersService;
-  let cartService: CartsService;
-  let datasource: DataSource;
-  let testDb: StartedPostgreSqlContainer;
-  let testRedis: StartedRedisContainer;
+  let cartsService: CartsService;
 
   beforeAll(async () => {
-    testDb = await new PostgreSqlContainer('postgres:18').start();
-    testRedis = await new RedisContainer('redis:8').start();
-    const connectionUri = testDb.getConnectionUri();
-
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          url: connectionUri,
-          entities: [Product, Order, OrderProduct, User],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([Product, Order, OrderProduct, User]),
-        CacheModule.registerAsync({
-          useFactory: () => {
-            return {
-              stores: [new KeyvRedis(testRedis.getConnectionUrl())],
-            };
-          },
-        }),
-      ],
-      providers: [
-        OrdersService,
-        CartsService,
-        { provide: ProductsService, useValue: vi.fn() },
-      ],
-    }).compile();
+      imports: [CacheModule.register()],
+      providers: [OrdersService, CartsService, ProductsService, PrismaService],
+    })
+      .overrideProvider(PrismaService)
+      .useValue(prisma)
+      .compile();
 
-    service = module.get<OrdersService>(OrdersService);
-    datasource = module.get<DataSource>(DataSource);
-    cartService = module.get<CartsService>(CartsService);
+    service = module.get(OrdersService);
+    cartsService = module.get(CartsService);
   });
 
-  afterAll(async () => {
-    await datasource.destroy();
-    await testDb.stop();
+  beforeEach(async () => {
+    await prisma.orderItem.deleteMany();
+    await prisma.order.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.user.deleteMany();
   });
 
-  describe('Order Transaction', () => {
-    const testCartKey = 'test-cart';
-    const testCartData: { cart: CartItem[] } = {
-      cart: [],
-    };
-
-    beforeAll(async () => {
-      const productsToOrder: FakeProduct[] = [];
-      for (let i = 0; i < 3; i++) {
-        const product = createFakeProduct();
-        productsToOrder.push(product);
-      }
-
-      await datasource.getRepository(Product).insert(productsToOrder);
-      const testUser = datasource.getRepository(User).create({
-        id: 'test-user-id',
-        name: 'John Doe',
-        email: 'john.doe@gmail.com',
-        avatar: 'https://johnspics.com/air.png',
-      });
-      await datasource.getRepository(User).save(testUser);
-
-      const products = await datasource.getRepository(Product).find();
-
-      products.forEach((item) => {
-        const cartItem = {
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: faker.number.int({ min: 1, max: 10 }),
-          image: item.images[0],
-        };
-        testCartData.cart.push(cartItem);
-      });
-      await cartService.updateCart(testCartKey, testCartData);
-    });
-
-    it('should place an order, decrease stock, and clear cart', async () => {
-      const cartBeforeOrder = await cartService.getCart(testCartKey);
-      expect(cartBeforeOrder).toBeDefined();
-      expect(cartBeforeOrder?.cart.length).toBeGreaterThan(0);
-
-      const users = await datasource.getRepository(User).find();
-      const testUser = users[0];
-      await service.orderTransaction(
-        testCartData.cart,
-        testUser.id,
-        testCartKey,
-      );
-      const cartAfterOrder = await cartService.getCart(testCartKey);
-
-      const orders = await datasource
-        .getRepository(Order)
-        .find({ relations: ['products', 'user'] });
-
-      expect(orders).not.toHaveLength(0);
-      expect(orders[0].user).toBeDefined();
-      expect(orders[0].products).not.toHaveLength(0);
-      expect(cartAfterOrder).not.toBeDefined();
-    });
-  });
-
-  describe('basic CRUD operations', () => {
-    beforeEach(async () => {
-      await datasource.query('TRUNCATE "order" CASCADE');
-
-      await createFakeOrders({
-        service,
-        datasource,
-        productCount: 5,
-        orderCount: 3,
-      });
-    });
-
-    it('should get an order by id', async () => {
-      const orders = await datasource.getRepository(Order).find();
-      const order = await service.getOrder(orders[0].id);
-
-      expect(order).toBeDefined();
-      expect(order?.products).toBeDefined();
-      expect(order?.products.length).toBeGreaterThan(0);
-      expect(order?.products[0]).toHaveProperty('quantity');
-    });
-
-    it("should get a specfic user's orders", async () => {
-      const users = await datasource.getRepository(User).find();
-      const testUser = users[0];
-      const userOrders = await service.searchOrders({}, testUser.id);
-
-      expect(userOrders.total).toBeGreaterThan(0);
-    });
-
-    it('should update the status of an order', async () => {
-      const orders = await datasource.getRepository(Order).find();
-      const orderToUpdate = orders[0];
-      await service.updateOrderStatus(orderToUpdate.id, OrderStatus.COMPLETED);
-
-      const updatedOrder = await datasource
-        .getRepository(Order)
-        .findOneBy({ id: orderToUpdate.id });
-
-      expect(orderToUpdate.status).toBe(OrderStatus.PENDING);
-      expect(updatedOrder?.status).toBe(OrderStatus.COMPLETED);
-    });
-  });
-
-  describe('order search filtering', () => {
-    beforeAll(async () => {
-      await createFakeOrders({
-        service,
-        datasource,
-        productCount: 20,
-        orderCount: 30,
-      });
-    });
-
-    it('should filter orders by date range', async () => {
-      const now = new Date();
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      const data = await service.searchOrders({
-        dateRange: {
-          from: yesterday.toISOString(),
-          to: now.toISOString(),
+  describe('createOrder', () => {
+    it('throws if cart does not exist', async () => {
+      const user = await prisma.user.create({
+        data: {
+          id: randomUUID(),
+          name: 'Test User',
+          email: faker.internet.email(),
         },
       });
 
-      expect(data.total).toBeGreaterThan(0);
+      await expect(
+        service.createOrder(user.id, 'missing-cart'),
+      ).rejects.toThrow('Cart is empty');
     });
 
-    it('should filter orders by status', async () => {
-      const data = await service.searchOrders();
-      for (let i = 0; i < data.orders.length; i++) {
-        const order = data.orders[i];
-        await datasource
-          .getRepository(Order)
-          .update({ id: order.id }, { status: 'completed' });
-        i++;
-      }
+    it('throws if product stock is insufficient', async () => {
+      const product = await prisma.product.create({
+        data: createFakeProduct({ stock: 1 }),
+      });
 
-      const newData = await service.searchOrders({
+      const user = await prisma.user.create({
+        data: {
+          id: randomUUID(),
+          name: 'Test User',
+          email: faker.internet.email(),
+        },
+      });
+
+      const cartKey = 'low-stock-cart';
+      await cartsService.updateCart(cartKey, {
+        cart: [
+          {
+            id: product.id,
+            name: product.name,
+            price: product.price.toNumber(),
+            quantity: 5,
+            image: product.images[0],
+          },
+        ],
+      });
+
+      await expect(service.createOrder(user.id, cartKey)).rejects.toThrow();
+    });
+
+    it('creates order, items, decrements stock, and clears cart', async () => {
+      const products = await Promise.all(
+        Array.from({ length: 3 }).map(() =>
+          prisma.product.create({
+            data: createFakeProduct({ stock: 20 }),
+          }),
+        ),
+      );
+
+      const user = await prisma.user.create({
+        data: {
+          id: randomUUID(),
+          name: 'Buyer',
+          email: faker.internet.email(),
+        },
+      });
+
+      const cartKey = 'valid-cart';
+      await cartsService.updateCart(cartKey, {
+        cart: products.map((p) => ({
+          id: p.id,
+          name: p.name,
+          price: p.price.toNumber(),
+          quantity: 2,
+          image: p.images[0],
+        })),
+      });
+
+      const result = await service.createOrder(user.id, cartKey);
+
+      expect(result.order).toBeDefined();
+      expect(result.orderItems).toHaveLength(products.length);
+
+      const dbOrder = await prisma.order.findUnique({
+        where: { id: result.order.id },
+        include: { OrderItem: true },
+      });
+
+      expect(dbOrder?.OrderItem.length).toBe(products.length);
+
+      const updatedProducts = await prisma.product.findMany();
+      updatedProducts.forEach((p) => {
+        expect(p.stock).toBe(18);
+      });
+
+      const cartAfter = await cartsService.getCart(cartKey);
+      expect(cartAfter).toBeUndefined();
+    });
+  });
+
+  describe('getOrder', () => {
+    it('throws if order does not exist', async () => {
+      await expect(service.getOrder(randomUUID())).rejects.toThrow();
+    });
+
+    it('returns mapped DTO with items', async () => {
+      const product = await prisma.product.create({
+        data: createFakeProduct(),
+      });
+
+      const user = await prisma.user.create({
+        data: {
+          id: randomUUID(),
+          name: 'User',
+          email: faker.internet.email(),
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          userId: user.id,
+          total: product.price,
+          OrderItem: {
+            create: {
+              productId: product.id,
+              quantity: 1,
+              priceAtTime: product.price,
+            },
+          },
+        },
+      });
+
+      const dto = await service.getOrder(order.id);
+
+      expect(dto.id).toBe(order.id);
+      expect(dto.items).toHaveLength(1);
+      expect(dto.items[0]).toMatchObject({
+        id: product.id,
+        name: product.name,
+        quantity: 1,
+      });
+    });
+  });
+
+  describe('searchOrders', () => {
+    beforeEach(async () => {
+      const user = await prisma.user.create({
+        data: {
+          id: randomUUID(),
+          name: 'Searcher',
+          email: faker.internet.email(),
+        },
+      });
+
+      for (let i = 0; i < 10; i++) {
+        await prisma.order.create({
+          data: {
+            userId: user.id,
+            total: faker.number.int({ min: 10, max: 200 }),
+            status: i % 2 === 0 ? OrderStatus.COMPLETED : OrderStatus.PENDING,
+            createdAt: faker.date.recent({ days: 3 }),
+          },
+        });
+      }
+    });
+
+    it('paginates results', async () => {
+      const res = await service.searchOrders({}, undefined, 1, 5);
+
+      expect(res.orders).toHaveLength(5);
+      expect(res.totalPages).toBeGreaterThan(1);
+    });
+
+    it('filters by status', async () => {
+      const res = await service.searchOrders({
         status: OrderStatus.COMPLETED,
       });
-      expect(newData.total).toBeGreaterThan(0);
+
+      res.orders.forEach((o) => expect(o.status).toBe(OrderStatus.COMPLETED));
+    });
+
+    it('filters by date range', async () => {
+      const from = new Date();
+      from.setDate(from.getDate() - 2);
+
+      const res = await service.searchOrders({
+        dateRange: {
+          from: from.toISOString(),
+          to: new Date().toISOString(),
+        },
+      });
+
+      expect(res.total).toBeGreaterThan(0);
+    });
+  });
+
+  describe('updateOrderStatus', () => {
+    it('updates only the order status', async () => {
+      const user = await prisma.user.create({
+        data: {
+          id: randomUUID(),
+          name: 'Updater',
+          email: faker.internet.email(),
+        },
+      });
+
+      const order = await prisma.order.create({
+        data: {
+          userId: user.id,
+          total: 100,
+        },
+      });
+
+      const res = await service.updateOrderStatus(
+        order.id,
+        OrderStatus.COMPLETED,
+      );
+
+      expect(res).toEqual({
+        id: order.id,
+        status: OrderStatus.COMPLETED,
+      });
     });
   });
 });

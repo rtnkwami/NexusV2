@@ -1,17 +1,10 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderStatus } from './dto/update-order.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Order } from './entities/order.entity';
-import { Between, DataSource, FindOptionsWhere, Repository } from 'typeorm';
 import { CartsService } from 'src/carts/carts.service';
 import { ProductsService } from 'src/products/products.service';
-import { Product } from 'src/products/entities/product.entity';
 import { OrderSearchFilters } from './types/order-search';
-import { OrderProduct } from './entities/order-product.entity';
+import { PrismaService } from 'src/prisma.service';
+import { Prisma } from 'src/generated/prisma/client';
 
 export type CartItem = {
   id: string;
@@ -24,60 +17,12 @@ export type CartItem = {
 @Injectable()
 export class OrdersService {
   constructor(
-    @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
+    private prisma: PrismaService,
     private productService: ProductsService,
     private cartsService: CartsService,
-    private dataSource: DataSource,
   ) {}
 
-  async orderTransaction(
-    cart: CartItem[],
-    userId: string,
-    cartKey: string,
-  ): Promise<{ orderId: string }> {
-    const order = await this.dataSource.transaction(async (manager) => {
-      const total = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
-
-      const newOrder = manager.create(Order, {
-        total,
-        user: { id: userId },
-      });
-      await manager.save(newOrder);
-
-      await Promise.all(
-        cart.map(async (item) => {
-          await manager.decrement(
-            Product,
-            { id: item.id },
-            'stock',
-            item.quantity,
-          );
-
-          const orderProduct = manager.create(OrderProduct, {
-            quantity: item.quantity,
-            priceAtTime: item.price,
-            product: { id: item.id },
-            order: newOrder,
-            createdAt: newOrder.createdAt,
-          });
-
-          return manager.save(orderProduct);
-        }),
-      );
-      await this.cartsService.clearCart(cartKey);
-      return newOrder;
-    });
-    return { orderId: order.id };
-  }
-
-  async placeOrder(
-    cartKey: string,
-    userId: string,
-  ): Promise<{ orderId: string }> {
+  async createOrder(userId: string, cartKey: string) {
     const data = await this.cartsService.getCart(cartKey);
 
     if (!data) {
@@ -91,83 +36,124 @@ export class OrdersService {
         item.quantity,
       );
     }
-    const newOrder = await this.orderTransaction(data.cart, userId, cartKey);
-    return newOrder;
+
+    return this.prisma.$transaction(async (tx) => {
+      const total = data.cart.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+
+      await Promise.all(
+        data.cart.map((item) =>
+          tx.product.update({
+            where: { id: item.id },
+            data: { stock: { decrement: item.quantity } },
+          }),
+        ),
+      );
+
+      const order = await tx.order.create({
+        data: { userId, total },
+      });
+
+      const orderItems = await Promise.all(
+        data.cart.map((item) =>
+          tx.orderItem.create({
+            data: {
+              orderId: order.id,
+              productId: item.id,
+              quantity: item.quantity,
+              priceAtTime: item.price,
+            },
+          }),
+        ),
+      );
+
+      await this.cartsService.clearCart(cartKey);
+
+      return { order, orderItems };
+    });
   }
 
   async searchOrders(
     filters?: OrderSearchFilters,
     userId?: string,
-    page?: number,
-    limit?: number,
-  ): Promise<{
-    orders: Order[];
-    page: number;
-    perPage: number;
-    count: number;
-    total: number;
-    totalPages: number;
-  }> {
-    const take = limit ?? 20;
-    const currentPage = page ?? 1;
-    const skip = ((currentPage ?? 1) - 1) * take;
+    page: number = 1,
+    limit: number = 20,
+  ) {
+    const skip = (page - 1) * limit;
 
-    const whereClause: FindOptionsWhere<Order> = {};
+    const where: Prisma.OrderWhereInput = {
+      userId: userId,
 
-    if (userId) {
-      whereClause.user = {
-        id: userId,
-      };
-    }
+      status: filters?.status,
 
-    if (filters?.dateRange) {
-      whereClause.createdAt = Between(
-        filters.dateRange.from,
-        filters.dateRange.to,
-      );
-    }
+      createdAt: filters?.dateRange && {
+        gte: filters.dateRange.from,
+        lte: filters.dateRange.to,
+      },
+    };
 
-    if (filters?.status) {
-      whereClause.status = filters.status;
-    }
-
-    const [orders, totalOrders] = await this.orderRepository.findAndCount({
-      where: whereClause,
-      skip,
-      take,
-    });
+    const [orders, totalOrders] = await Promise.all([
+      this.prisma.order.findMany({ where, skip, take: limit }),
+      this.prisma.order.count({ where }),
+    ]);
 
     return {
       orders,
-      page: currentPage,
-      perPage: take,
+      page,
+      perPage: limit,
       count: orders.length,
       total: totalOrders,
-      totalPages: Math.ceil(totalOrders / take),
+      totalPages: Math.ceil(totalOrders / limit),
     };
   }
 
-  async getOrder(uuid: string): Promise<Order> {
-    const order = await this.orderRepository.findOne({
+  async getOrder(uuid: string) {
+    const order = await this.prisma.order.findUniqueOrThrow({
+      relationLoadStrategy: 'join',
       where: { id: uuid },
-      relations: ['products'],
+      include: {
+        OrderItem: {
+          select: {
+            quantity: true,
+            priceAtTime: true,
+            Product: {
+              select: {
+                id: true,
+                name: true,
+                images: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    if (!order) {
-      throw new NotFoundException('Order does not exist');
-    }
-    return order;
+    const orderDto = {
+      id: order.id,
+      status: order.status,
+      userId: order.userId,
+      total: order.total.toNumber(),
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      items: order.OrderItem.map((item) => ({
+        id: item.Product.id,
+        name: item.Product.name,
+        images: item.Product.images,
+        quantity: item.quantity,
+        price: item.priceAtTime.toNumber(),
+      })),
+    };
+
+    return orderDto;
   }
 
-  async updateOrderStatus(
-    uuid: string,
-    newStatus: OrderStatus,
-  ): Promise<Order> {
-    const order = await this.orderRepository.findOneBy({ id: uuid });
-    if (!order) {
-      throw new NotFoundException('Order does not exist');
-    }
-    Object.assign(order, { status: newStatus });
-    return this.orderRepository.save(order);
+  async updateOrderStatus(id: string, status: OrderStatus) {
+    return this.prisma.order.update({
+      where: { id },
+      data: { status },
+      select: { id: true, status: true },
+    });
   }
 }
