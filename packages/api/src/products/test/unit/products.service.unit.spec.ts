@@ -1,35 +1,33 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Product } from 'src/products/entities/product.entity';
-import { ProductsService } from 'src/products/products.service';
-import { afterEach, it, expect, describe, vi, beforeAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
-import createFakeProduct from 'test/utils/fakeProducts';
 
-describe('ProductService (Unit)', () => {
+import { ProductsService } from 'src/products/products.service';
+import { PrismaService } from 'src/prisma.service';
+import createFakeProduct from 'test/utils/fakeProducts';
+import { randomUUID } from 'crypto';
+
+describe('ProductsService (Unit)', () => {
   let service: ProductsService;
 
-  const mockProductRepository = {
-    create: vi.fn(),
-    findOne: vi.fn(),
-    findOneBy: vi.fn(),
-    findAndCount: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    save: vi.fn(),
+  const prismaMock = {
+    product: {
+      findUnique: vi.fn(),
+    },
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductsService,
         {
-          provide: getRepositoryToken(Product),
-          useValue: mockProductRepository,
+          provide: PrismaService,
+          useValue: prismaMock,
         },
       ],
     }).compile();
-    service = module.get<ProductsService>(ProductsService);
+
+    service = module.get(ProductsService);
   });
 
   afterEach(() => {
@@ -37,41 +35,54 @@ describe('ProductService (Unit)', () => {
   });
 
   describe('ensureSufficientProductStock', () => {
-    it('should throw NotFoundException if product does not exist', async () => {
-      mockProductRepository.findOneBy.mockResolvedValue(null);
+    it('throws NotFoundException if product does not exist', async () => {
+      prismaMock.product.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.ensureSufficientProductStock('non-existent-uuid', 5),
+        service.ensureSufficientProductStock('non-existent-id', 5),
       ).rejects.toThrow(NotFoundException);
+
+      expect(prismaMock.product.findUnique).toHaveBeenCalledWith({
+        where: { id: 'non-existent-id' },
+      });
     });
 
-    it('should throw BadRequestException if product does not have sufficient stock', async () => {
-      const testProduct = createFakeProduct({ stock: 2 });
+    it('throws BadRequestException if stock is insufficient', async () => {
+      const product = {
+        id: randomUUID(),
+        ...createFakeProduct({ stock: 2 }),
+      };
 
-      mockProductRepository.findOneBy.mockResolvedValue(testProduct);
+      prismaMock.product.findUnique.mockResolvedValue(product);
 
       await expect(
-        service.ensureSufficientProductStock('test-uuid', 5),
+        service.ensureSufficientProductStock(product.id, 5),
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should not throw if product has sufficient stock', async () => {
-      const testProduct = createFakeProduct({ stock: 10 });
+    it('does not throw if stock is sufficient', async () => {
+      const product = {
+        id: randomUUID(),
+        ...createFakeProduct({ stock: 10 }),
+      };
 
-      mockProductRepository.findOneBy.mockResolvedValue(testProduct);
+      prismaMock.product.findUnique.mockResolvedValue(product);
 
       await expect(
-        service.ensureSufficientProductStock('test-uuid', 5),
+        service.ensureSufficientProductStock(product.id, 5),
       ).resolves.not.toThrow();
     });
 
-    it('should not throw if requested quantity equals available stock', async () => {
-      const testProduct = createFakeProduct({ stock: 5 });
+    it('does not throw if requested quantity equals stock', async () => {
+      const product = {
+        id: randomUUID(),
+        ...createFakeProduct({ stock: 5 }),
+      };
 
-      mockProductRepository.findOneBy.mockResolvedValue(testProduct);
+      prismaMock.product.findUnique.mockResolvedValue(product);
 
       await expect(
-        service.ensureSufficientProductStock('test-uuid', 5),
+        service.ensureSufficientProductStock(product.id, 5),
       ).resolves.not.toThrow();
     });
   });

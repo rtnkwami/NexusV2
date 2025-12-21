@@ -101,7 +101,7 @@ export class ProductsController {
 
   @ApiOperation({
     summary: 'Get a product',
-    description: 'Get a single product. A valid uuid must be used.',
+    description: 'Get a single product. A valid id must be used.',
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @ApiNotFoundResponse({
@@ -113,15 +113,15 @@ export class ProductsController {
       },
     },
   })
-  @Get(':uuid')
-  getProduct(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.productsService.getProduct(uuid);
+  @Get(':id')
+  getProduct(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.productsService.getProduct(id);
   }
 
   @ApiOperation({
     summary: 'Update a product',
     description:
-      'Update a single product. A valid uuid must be used. Auth is required.',
+      'Update a single product. A valid id must be used. Auth is required.',
   })
   @ApiBearerAuth()
   @ApiUnauthorizedResponse({
@@ -154,18 +154,18 @@ export class ProductsController {
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @ApiBody({ required: false, type: UpdateProductDto })
   @Auth()
-  @Patch(':uuid')
+  @Patch(':id')
   updateProduct(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsService.updateProduct(uuid, updateProductDto);
+    return this.productsService.updateProduct(id, updateProductDto);
   }
 
   @ApiOperation({
     summary: 'Delete a product',
     description:
-      'Delete a single product. A valid uuid must be used. Auth is required.',
+      'Delete a single product. A valid id must be used. Auth is required.',
   })
   @ApiBearerAuth()
   @ApiUnauthorizedResponse({
@@ -197,8 +197,8 @@ export class ProductsController {
   })
   @ApiResponse({ status: 200, type: ProductWithoutOrdersDto })
   @Auth()
-  @Delete(':uuid')
-  deleteProduct(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.productsService.removeProduct(uuid);
+  @Delete(':id')
+  deleteProduct(@Param('id', new ParseUUIDPipe()) id: string) {
+    return this.productsService.removeProduct(id);
   }
 }
