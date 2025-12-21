@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from './products/products.module';
 import Joi from 'joi';
-import { AppDataSource } from './data-source';
-import { UsersModule } from './users/users.module';
-import { CartsModule } from './carts/carts.module';
+// import { UsersModule } from './users/users.module';
+// import { CartsModule } from './carts/carts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
-import { OrdersModule } from './orders/orders.module';
+// import { OrdersModule } from './orders/orders.module';
 import { AppController } from './app.controller';
 import { LoggerModule } from 'nestjs-pino';
 
@@ -30,10 +28,6 @@ import { LoggerModule } from 'nestjs-pino';
         abortEarly: true,
       },
     }),
-    TypeOrmModule.forRoot({
-      ...AppDataSource.options,
-      autoLoadEntities: true,
-    }),
     CacheModule.registerAsync({
       isGlobal: true,
       useFactory: () => {
@@ -44,9 +38,9 @@ import { LoggerModule } from 'nestjs-pino';
     }),
     LoggerModule.forRoot(),
     ProductsModule,
-    UsersModule,
-    CartsModule,
-    OrdersModule,
+    // UsersModule,
+    // CartsModule,
+    // OrdersModule,
   ],
   controllers: [AppController],
 })
