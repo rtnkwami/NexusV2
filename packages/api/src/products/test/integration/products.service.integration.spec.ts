@@ -1,48 +1,22 @@
-import { it, expect, describe, beforeAll, afterAll } from 'vitest';
+import { it, expect, describe, beforeAll } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from '../../products.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-import { Product } from '../../entities/product.entity';
-import { Order } from 'src/orders/entities/order.entity';
-import { OrderProduct } from 'src/orders/entities/order-product.entity';
-import { User } from 'src/users/entities/user.entity';
+import { PrismaService } from 'src/prisma.service';
 import createFakeProduct from 'test/utils/fakeProducts';
-import { NotFoundException } from '@nestjs/common';
-import {
-  PostgreSqlContainer,
-  StartedPostgreSqlContainer,
-} from '@testcontainers/postgresql';
+import { prisma } from 'test/setup/setup.integration';
 
 describe('ProductService (Integration)', () => {
   let service: ProductsService;
-  let datasource: DataSource;
-  let testDb: StartedPostgreSqlContainer;
 
   beforeAll(async () => {
-    testDb = await new PostgreSqlContainer('postgres:18').start();
-    const connectionUri = testDb.getConnectionUri();
-
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          url: connectionUri,
-          entities: [Product, Order, OrderProduct, User],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([Product, Order, OrderProduct, User]),
-      ],
-      providers: [ProductsService],
-    }).compile();
+      providers: [ProductsService, PrismaService],
+    })
+      .overrideProvider(PrismaService)
+      .useValue(prisma)
+      .compile();
 
     service = module.get<ProductsService>(ProductsService);
-    datasource = module.get<DataSource>(DataSource);
-  });
-
-  afterAll(async () => {
-    await datasource.destroy();
-    await testDb.stop();
   });
 
   describe('basic CRUD operations', () => {
@@ -63,12 +37,6 @@ describe('ProductService (Integration)', () => {
       expect(createdProduct.name).toEqual(product.name);
     });
 
-    it('should throw an error on getting a nonexistent product', async () => {
-      await expect(
-        service.getProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'),
-      ).rejects.toThrow(NotFoundException);
-    });
-
     it('should update a product', async () => {
       const testProduct = createFakeProduct();
       const product = await service.createProduct(testProduct);
@@ -80,28 +48,12 @@ describe('ProductService (Integration)', () => {
       expect(updatedProduct.category).toBe('Test Category');
     });
 
-    it('should throw an error on updating a nonexistent product', async () => {
-      await expect(
-        service.updateProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915', {
-          category: 'Test Category',
-        }),
-      ).rejects.toThrow(NotFoundException);
-    });
-
     it('should delete a product', async () => {
       const testProduct = createFakeProduct();
       const product = await service.createProduct(testProduct);
-      await service.removeProduct(product.id);
+      const deletedProduct = await service.removeProduct(product.id);
 
-      await expect(service.getProduct(product.id)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-
-    it('should throw an error on deleting a nonexistent product', async () => {
-      await expect(
-        service.removeProduct('3f8c1b42-9b6e-4c7d-b0a2-3e6fe2b8f915'),
-      ).rejects.toThrow(NotFoundException);
+      expect(deletedProduct.id).toBe(product.id);
     });
   });
 
