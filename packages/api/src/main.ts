@@ -7,11 +7,14 @@ import {
   SwaggerModule,
 } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
+import { PrismaExceptionFilter } from './exceptions/prisma-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
   app.useLogger(app.get(Logger));
+
+  app.useGlobalFilters(new PrismaExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({
