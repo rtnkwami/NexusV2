@@ -6,6 +6,7 @@ import {
 import { ProductSearchFilters } from './types/product-search';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -59,14 +60,14 @@ export class ProductsService {
     };
   }
 
-  async ensureSufficientProductStock(uuid: string, desiredQuantity: number) {
+  async ensureSufficientProductStock(id: string, desiredQuantity: number) {
     const product = await this.prisma.product.findUnique({
-      where: { id: uuid },
+      where: { id },
     });
 
     if (!product) {
       throw new NotFoundException(
-        `Product ${uuid} does not exist. Cannot be ordered`,
+        `Product ${id} does not exist. Cannot be ordered`,
       );
     }
 
@@ -78,25 +79,15 @@ export class ProductsService {
     }
   }
 
-  async getProduct(uuid: string) {
-    const product = await this.prisma.product.findUniqueOrThrow({
-      where: { id: uuid },
-    });
-    return product;
+  async getProduct(id: string) {
+    return this.prisma.product.findUniqueOrThrow({ where: { id } });
   }
 
-  async updateProduct(uuid: string, data: Prisma.ProductUpdateInput) {
-    const updatedProduct = this.prisma.product.update({
-      where: { id: uuid },
-      data,
-    });
-    return updatedProduct;
+  async updateProduct(id: string, data: UpdateProductDto) {
+    return this.prisma.product.update({ where: { id }, data });
   }
 
-  async removeProduct(uuid: string) {
-    const deletedProduct = await this.prisma.product.delete({
-      where: { id: uuid },
-    });
-    return deletedProduct;
+  removeProduct(id: string) {
+    return this.prisma.product.delete({ where: { id } });
   }
 }
