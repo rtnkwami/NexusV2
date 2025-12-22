@@ -142,12 +142,12 @@ paths:
         "500": *a2
       summary: Get products
       tags: *a3
-  /products/{uuid}:
+  /products/{id}:
     get:
-      description: Get a single product. A valid uuid must be used.
+      description: Get a single product. A valid id must be used.
       operationId: getProduct
       parameters:
-        - name: uuid
+        - name: id
           required: true
           in: path
           schema:
@@ -175,10 +175,10 @@ paths:
       summary: Get a product
       tags: *a3
     patch:
-      description: Update a single product. A valid uuid must be used. Auth is required.
+      description: Update a single product. A valid id must be used. Auth is required.
       operationId: updateProduct
       parameters:
-        - name: uuid
+        - name: id
           required: true
           in: path
           schema:
@@ -238,10 +238,10 @@ paths:
       summary: Update a product
       tags: *a3
     delete:
-      description: Delete a single product. A valid uuid must be used. Auth is required.
+      description: Delete a single product. A valid id must be used. Auth is required.
       operationId: deleteProduct
       parameters:
-        - name: uuid
+        - name: id
           required: true
           in: path
           schema:
@@ -745,10 +745,32 @@ components:
     PlaceOrderResponseDto:
       type: object
       properties:
-        orderId:
+        id:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - cancelled
+            - completed
+        total:
+          type: string
+          description: Order total as a decimal string
+        userId:
           type: string
       required:
-        - orderId
+        - id
+        - createdAt
+        - updatedAt
+        - status
+        - total
+        - userId
     DateRangeDto:
       type: object
       properties:
