@@ -38,7 +38,7 @@ describe('OrdersService', () => {
   });
 
   describe('createOrder', () => {
-    it('throws if cart does not exist', async () => {
+    it('should throw if cart does not exist', async () => {
       const user = await prisma.user.create({
         data: {
           id: randomUUID(),
@@ -52,7 +52,7 @@ describe('OrdersService', () => {
       ).rejects.toThrow('Cart is empty');
     });
 
-    it('throws if product stock is insufficient', async () => {
+    it('should throw if product stock is insufficient', async () => {
       const product = await prisma.product.create({
         data: createFakeProduct({ stock: 1 }),
       });
@@ -81,7 +81,7 @@ describe('OrdersService', () => {
       await expect(service.createOrder(user.id, cartKey)).rejects.toThrow();
     });
 
-    it('creates order, items, decrements stock, and clears cart', async () => {
+    it('should create order, items, decrements stock, and clears cart', async () => {
       const products = await Promise.all(
         Array.from({ length: 3 }).map(() =>
           prisma.product.create({
@@ -132,11 +132,11 @@ describe('OrdersService', () => {
   });
 
   describe('getOrder', () => {
-    it('throws if order does not exist', async () => {
+    it('should throw if order does not exist', async () => {
       await expect(service.getOrder(randomUUID())).rejects.toThrow();
     });
 
-    it('returns mapped DTO with items', async () => {
+    it('should return mapped DTO with items', async () => {
       const product = await prisma.product.create({
         data: createFakeProduct(),
       });
@@ -197,14 +197,14 @@ describe('OrdersService', () => {
       }
     });
 
-    it('paginates results', async () => {
+    it('should paginate results', async () => {
       const res = await service.searchOrders({}, undefined, 1, 5);
 
       expect(res.orders).toHaveLength(5);
       expect(res.totalPages).toBeGreaterThan(1);
     });
 
-    it('filters by status', async () => {
+    it('should filter by status', async () => {
       const res = await service.searchOrders({
         status: OrderStatus.COMPLETED,
       });
@@ -212,7 +212,7 @@ describe('OrdersService', () => {
       res.orders.forEach((o) => expect(o.status).toBe(OrderStatus.COMPLETED));
     });
 
-    it('filters by date range', async () => {
+    it('should filter by date range', async () => {
       const from = new Date();
       from.setDate(from.getDate() - 2);
 
@@ -228,7 +228,7 @@ describe('OrdersService', () => {
   });
 
   describe('updateOrderStatus', () => {
-    it('updates only the order status', async () => {
+    it('should update only the order status', async () => {
       const user = await prisma.user.create({
         data: {
           id: randomUUID(),
