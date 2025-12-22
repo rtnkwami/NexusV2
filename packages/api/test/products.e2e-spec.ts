@@ -1,21 +1,44 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { App } from 'supertest/types';
 import request from 'supertest';
 import {
   ProductSearchResponseDto,
   ProductWithoutOrdersDto,
 } from 'src/products/dto/search-product-response.dto';
-import { DataSource } from 'typeorm';
-import createTestApp from './utils/setup';
 import { beforeEach, afterAll, it, expect, describe, beforeAll } from 'vitest';
 import createFakeProduct from './utils/fakeProducts';
+import { prisma } from './setup/setup.e2e';
+import { AppModule } from 'src/app.module';
+import { FirebaseAuthGuard } from 'src/auth/auth.guard';
+import { BypassAuthGuard } from './utils/auth.override';
+import { PrismaService } from 'src/prisma.service';
 
 describe('Products (e2e)', () => {
   let app: INestApplication<App>;
-  let datasource: DataSource;
 
   beforeAll(async () => {
-    ({ app, datasource } = await createTestApp());
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideGuard(FirebaseAuthGuard)
+      .useClass(BypassAuthGuard)
+      .overrideProvider(PrismaService)
+      .useValue(prisma)
+      .compile();
+
+    app = moduleRef.createNestApplication();
+
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        stopAtFirstError: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
+
+    await app.init();
   });
 
   afterAll(async () => {
@@ -24,7 +47,7 @@ describe('Products (e2e)', () => {
 
   describe('/products (POST)', () => {
     beforeEach(async () => {
-      await datasource.query('TRUNCATE TABLE product CASCADE;');
+      await prisma.product.deleteMany();
     });
 
     it('should create a product', async () => {
@@ -76,14 +99,4 @@ describe('Products (e2e)', () => {
       });
     });
   });
-
-  // describe('/products (GET)', () => {
-  //   beforeAll(async () => {
-
-  //   })
-
-  //   it('should return a paginated list of products', () => {
-
-  //   })
-  // })
 });

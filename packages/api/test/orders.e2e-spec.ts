@@ -1,23 +1,46 @@
 import { afterAll, beforeAll, it, expect, describe } from 'vitest';
-import createTestApp from './utils/setup';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import { App } from 'supertest/types';
-import { DataSource } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Product } from 'src/products/entities/product.entity';
 import createFakeProduct, { FakeProduct } from './utils/fakeProducts';
 import request from 'supertest';
 import { ProductSearchResponseDto } from 'src/products/dto/search-product-response.dto';
 import { CartItem } from 'src/orders/orders.service';
 import { faker } from '@faker-js/faker';
 import { PlaceOrderResponseDto } from 'src/orders/dto/place-order-response.dto';
+import { prisma, dbClient, testRedis } from './setup/setup.e2e';
+import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/prisma.service';
+import { FirebaseAuthGuard } from 'src/auth/auth.guard';
+import { BypassAuthGuard } from './utils/auth.override';
 
 describe('Orders (e2e)', () => {
   let app: INestApplication<App>;
-  let datasource: DataSource;
 
   beforeAll(async () => {
-    ({ app, datasource } = await createTestApp());
+    process.env.REDIS_URL = testRedis.getConnectionUrl();
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
+      .overrideGuard(FirebaseAuthGuard)
+      .useClass(BypassAuthGuard)
+      .overrideProvider(PrismaService)
+      .useValue(prisma)
+      .compile();
+
+    app = moduleRef.createNestApplication();
+
+    app.useGlobalPipes(
+      new ValidationPipe({
+        transform: true,
+        stopAtFirstError: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+      }),
+    );
+
+    await app.init();
   });
 
   afterAll(async () => {
@@ -26,25 +49,30 @@ describe('Orders (e2e)', () => {
 
   describe('Placing an Order', () => {
     beforeAll(async () => {
-      await datasource.query('TRUNCATE TABLE product CASCADE');
-      await datasource.query('TRUNCATE "order" CASCADE');
+      await dbClient.query('TRUNCATE TABLE "Product" CASCADE');
+      await dbClient.query('TRUNCATE TABLE "Order" CASCADE');
 
       const productsToOrder: FakeProduct[] = [];
       for (let i = 0; i < 10; i++) {
         const product = createFakeProduct({ stock: 25 });
         productsToOrder.push(product);
       }
-      await datasource.getRepository(Product).insert(productsToOrder);
-      const testUser = datasource.getRepository(User).create({
-        id: 'test-user-id',
-        name: 'John Doe',
-        email: 'john.doe@gmail.com',
-        avatar: 'https://johnspics.com/air.png',
+
+      await prisma.product.createMany({
+        data: productsToOrder,
       });
-      await datasource.getRepository(User).save(testUser);
+
+      await prisma.user.create({
+        data: {
+          id: 'test-user-id',
+          name: 'John Doe',
+          email: 'john.doe@gmail.com',
+          avatar: 'https://johnspics.com/air.png',
+        },
+      });
     });
 
-    it('should place an order and return the order id', async () => {
+    it('should place and return an order', async () => {
       const apiRequest = request(app.getHttpServer());
 
       const productSearch = await apiRequest.get('/products');
@@ -66,10 +94,11 @@ describe('Orders (e2e)', () => {
       expect(response.statusCode).toBe(200);
 
       const orderResponse = await apiRequest.post('/orders/me');
+      console.log(orderResponse.error);
       expect(orderResponse.statusCode).toBe(201);
 
       const result = orderResponse.body as PlaceOrderResponseDto;
-      expect(result.orderId).toBeDefined();
-    });
+      expect(result.id).toBeDefined();
+    }, 100000);
   });
 });

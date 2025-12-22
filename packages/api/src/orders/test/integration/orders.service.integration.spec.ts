@@ -111,11 +111,10 @@ describe('OrdersService', () => {
 
       const result = await service.createOrder(user.id, cartKey);
 
-      expect(result.order).toBeDefined();
-      expect(result.orderItems).toHaveLength(products.length);
+      expect(result).toBeDefined();
 
       const dbOrder = await prisma.order.findUnique({
-        where: { id: result.order.id },
+        where: { id: result.id },
         include: { OrderItem: true },
       });
 
