@@ -53,20 +53,6 @@ jobs:
       FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
       FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
       FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
-
-    services:
-      postgres:
-        image: postgres:18
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: ${{ secrets.DATABASE_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}
-      redis:
-        image: redis:8.4.0
-        ports:
-          - 6379:6379
     
     steps:
       - uses: actions/checkout@v5
@@ -82,8 +68,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run test database migrations
-        run: pnpm run:migration
+      - name: Pull test images
+        run: docker pull postgres:18 && docker pull redis:8.4.0
 
       - name: Run e2e tests
         run: pnpm test:api:e2e
