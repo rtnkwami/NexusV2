@@ -41,6 +41,7 @@ export default defineConfig({
           name: 'e2e',
           include: ['**/*.e2e-spec.ts'],
           exclude: ['./test/openapi.e2e-spec.ts'],
+          setupFiles: ['test/setup/setup.e2e.ts'],
           sequence: {
             shuffle: {
               files: true,
