@@ -41,6 +41,7 @@ export class CartsService {
   ) {
     const cart = new Map(currentCart.map((item) => [item.id, item]));
 
+    // deduplicate items in cart
     incomingCart.forEach((item) => {
       if (cart.has(item.id)) {
         const existingItem = cart.get(item.id)!;
