@@ -35,7 +35,7 @@ export class CartsController {
   @ApiResponse({ status: 200, type: UpdateCartDto })
   @Get('me')
   getCart(@CurrentUser() user: DecodedIdToken) {
-    const cartKey = `cart-${user.sub}`;
+    const cartKey = user.sub;
     return this.cartsService.getCart(cartKey);
   }
 
@@ -50,7 +50,7 @@ export class CartsController {
     @CurrentUser() user: DecodedIdToken,
     @Body() cartData: UpdateCartDto,
   ) {
-    const cartKey = `cart-${user.sub}`;
+    const cartKey = user.sub;
     return this.cartsService.updateCart(cartKey, cartData);
   }
 
@@ -72,7 +72,7 @@ export class CartsController {
   })
   @Delete('me')
   async clear(@CurrentUser() user: DecodedIdToken) {
-    const cartKey = `cart-${user.sub}`;
+    const cartKey = user.sub;
     await this.cartsService.clearCart(cartKey);
     return {
       cart: [],

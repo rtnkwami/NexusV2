@@ -12,18 +12,21 @@ export class CartsService {
   ) {}
 
   async getCart(cartKey: string): Promise<UpdateCartDto | undefined> {
-    return await this.cacheManager.get<UpdateCartDto>(cartKey);
+    const cart = await this.cacheManager.get<UpdateCartDto>(`cart-${cartKey}`);
+    return cart;
   }
 
   async updateCart(
     cartKey: string,
     data: UpdateCartDto,
   ): Promise<UpdateCartDto | undefined> {
-    const cacheResponse = await this.cacheManager.get<UpdateCartDto>(cartKey);
+    const cacheResponse = await this.cacheManager.get<UpdateCartDto>(
+      `cart-${cartKey}`,
+    );
     const currentCart = cacheResponse?.cart;
 
     if (!currentCart) {
-      return this.cacheManager.set<UpdateCartDto>(cartKey, data);
+      return this.cacheManager.set<UpdateCartDto>(`cart-${cartKey}`, data);
     }
 
     const incomingCart = data.cart;
@@ -53,6 +56,6 @@ export class CartsService {
   }
 
   async clearCart(cartKey: string) {
-    return await this.cacheManager.del(cartKey);
+    return await this.cacheManager.del(`cart-${cartKey}`);
   }
 }
