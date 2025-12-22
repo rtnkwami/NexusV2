@@ -15,7 +15,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY ./out/full ./
 
-RUN pnpm prisma generate
+RUN pnpm generate:prisma
 
 RUN turbo build
 
