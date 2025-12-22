@@ -94,7 +94,6 @@ describe('Orders (e2e)', () => {
       expect(response.statusCode).toBe(200);
 
       const orderResponse = await apiRequest.post('/orders/me');
-      console.log(orderResponse.error);
       expect(orderResponse.statusCode).toBe(201);
 
       const result = orderResponse.body as PlaceOrderResponseDto;

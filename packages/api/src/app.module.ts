@@ -14,11 +14,6 @@ import { LoggerModule } from 'nestjs-pino';
   imports: [
     ConfigModule.forRoot({
       validationSchema: Joi.object({
-        DATABASE_USER: Joi.string().required(),
-        DATABASE_PASSWORD: Joi.string().required(),
-        DATABASE_NAME: Joi.string().required(),
-        DATABASE_PORT: Joi.number().port().required(),
-        DATABASE_HOST: Joi.string().required(),
         FIREBASE_PROJECT_ID: Joi.string().required(),
         FIREBASE_PRIVATE_KEY: Joi.string().required(),
         FIREBASE_CLIENT_EMAIL: Joi.string().required(),
