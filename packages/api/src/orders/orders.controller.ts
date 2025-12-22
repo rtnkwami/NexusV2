@@ -73,8 +73,8 @@ export class OrdersController {
   })
   @Post('me')
   createOrder(@CurrentUser() user: DecodedIdToken) {
-    const cartKey = `cart-${user.sub}`;
-    return this.ordersService.createOrder(cartKey, user.sub);
+    const cartKey = user.sub;
+    return this.ordersService.createOrder(user.sub, cartKey);
   }
 
   @Get()

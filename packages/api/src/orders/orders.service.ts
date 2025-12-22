@@ -56,7 +56,7 @@ export class OrdersService {
         data: { userId, total },
       });
 
-      const orderItems = await Promise.all(
+      await Promise.all(
         data.cart.map((item) =>
           tx.orderItem.create({
             data: {
@@ -71,7 +71,7 @@ export class OrdersService {
 
       await this.cartsService.clearCart(cartKey);
 
-      return { order, orderItems };
+      return { ...order };
     });
   }
 
