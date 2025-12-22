@@ -11,6 +11,9 @@ RUN pnpm add -g turbo@2.6.3
 
 COPY ./out/json ./
 
+# Dummy url for prisma client generation
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+
 RUN pnpm install --frozen-lockfile
 
 COPY ./out/full ./
@@ -27,7 +30,7 @@ WORKDIR /app
 
 COPY --from=builder /app/prod/dist ./dist
 COPY --from=builder /app/prod/node_modules ./node_modules
-COPY --from=builder /app/prod/package.json ./pacakge.json
+COPY --from=builder /app/prod/package.json ./package.json
 
 EXPOSE 5000
 

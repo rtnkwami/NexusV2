@@ -56,9 +56,6 @@ jobs:
     if: github.ref_name == 'main'
     runs-on: ubuntu-latest
 
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
     strategy:
       matrix:
         package: [api, web]
