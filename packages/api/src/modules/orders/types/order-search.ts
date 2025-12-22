@@ -1,6 +1,6 @@
-import { OrderStatusType } from '../entities/order.entity';
+import { OrderStatusEnum } from 'src/generated/prisma/enums';
 
 export type OrderSearchFilters = {
   dateRange?: { from: string; to: string };
-  status?: OrderStatusType;
+  status?: OrderStatusEnum;
 };
