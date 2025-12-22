@@ -1,7 +1,7 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CartsService } from 'src/carts/carts.service';
-import { CartItem } from 'src/orders/orders.service';
+import { CartsService } from 'src/modules/carts/carts.service';
+import { CartItem } from 'src/modules/orders/orders.service';
 import { it, expect, describe, vi, beforeAll } from 'vitest';
 
 describe('CartsService (Unit)', () => {

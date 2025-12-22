@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
-import { Product } from 'src/products/entities/product.entity';
+import { Product } from 'src/modules/products/entities/product.entity';
 
 @Entity()
 export class OrderProduct {

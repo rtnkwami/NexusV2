@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { ProductsModule } from './products/products.module';
+import { ProductsModule } from './modules/products/products.module';
 import Joi from 'joi';
-import { UsersModule } from './users/users.module';
-import { CartsModule } from './carts/carts.module';
+import { UsersModule } from './modules/users/users.module';
+import { CartsModule } from './modules/carts/carts.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import KeyvRedis from '@keyv/redis';
-import { OrdersModule } from './orders/orders.module';
+import { OrdersModule } from './modules/orders/orders.module';
 import { AppController } from './app.controller';
 import { LoggerModule } from 'nestjs-pino';
 

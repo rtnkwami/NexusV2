@@ -4,11 +4,11 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { faker } from '@faker-js/faker';
 import { randomUUID } from 'crypto';
 
-import { OrdersService } from 'src/orders/orders.service';
-import { CartsService } from 'src/carts/carts.service';
-import { ProductsService } from 'src/products/products.service';
+import { OrdersService } from 'src/modules/orders/orders.service';
+import { CartsService } from 'src/modules/carts/carts.service';
+import { ProductsService } from 'src/modules/products/products.service';
 import { PrismaService } from 'src/prisma.service';
-import { OrderStatus } from 'src/orders/dto/update-order.dto';
+import { OrderStatus } from 'src/modules/orders/dto/update-order.dto';
 
 import { prisma } from 'test/setup/setup.integration';
 import createFakeProduct from 'test/utils/fakeProducts';

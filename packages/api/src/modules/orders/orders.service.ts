@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderStatus } from './dto/update-order.dto';
-import { CartsService } from 'src/carts/carts.service';
-import { ProductsService } from 'src/products/products.service';
+import { CartsService } from 'src/modules/carts/carts.service';
+import { ProductsService } from 'src/modules/products/products.service';
 import { OrderSearchFilters } from './types/order-search';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';

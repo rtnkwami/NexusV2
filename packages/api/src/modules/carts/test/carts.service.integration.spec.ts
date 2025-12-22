@@ -6,7 +6,7 @@ import { RedisContainer, StartedRedisContainer } from '@testcontainers/redis';
 import { CartsService } from '../carts.service';
 import createFakeProduct from 'test/utils/fakeProducts';
 import { randomUUID } from 'crypto';
-import { CartItem } from 'src/orders/orders.service';
+import { CartItem } from 'src/modules/orders/orders.service';
 import { faker } from '@faker-js/faker';
 import { Cache } from 'cache-manager';
 

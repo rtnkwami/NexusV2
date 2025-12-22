@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
-import { ProductsService } from 'src/products/products.service';
+import { ProductsService } from 'src/modules/products/products.service';
 import { PrismaService } from 'src/prisma.service';
 import createFakeProduct from 'test/utils/fakeProducts';
 import { randomUUID } from 'crypto';

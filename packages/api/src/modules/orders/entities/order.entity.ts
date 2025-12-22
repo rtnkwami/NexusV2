@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { OrderProduct } from './order-product.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 import { OrderStatus } from '../dto/update-order.dto';
 
 export type OrderStatusType = 'pending' | 'cancelled' | 'completed';

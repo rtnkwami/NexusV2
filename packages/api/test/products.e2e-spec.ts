@@ -5,7 +5,7 @@ import request from 'supertest';
 import {
   ProductSearchResponseDto,
   ProductWithoutOrdersDto,
-} from 'src/products/dto/search-product-response.dto';
+} from 'src/modules/products/dto/search-product-response.dto';
 import { beforeEach, afterAll, it, expect, describe, beforeAll } from 'vitest';
 import createFakeProduct from './utils/fakeProducts';
 import { prisma } from './setup/setup.e2e';

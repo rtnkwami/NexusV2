@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { UpdateCartDto } from './dto/update-cart.dto';
-import { CartItem } from 'src/orders/orders.service';
+import { CartItem } from 'src/modules/orders/orders.service';
 
 @Injectable()
 export class CartsService {
