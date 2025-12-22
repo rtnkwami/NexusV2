@@ -15,9 +15,9 @@ RUN pnpm install --frozen-lockfile
 
 COPY ./out/full ./
 
-RUN turbo build
-
 RUN pnpm prisma generate
+
+RUN turbo build
 
 RUN pnpm deploy --filter=api --prod ./prod
 
