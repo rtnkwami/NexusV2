@@ -38,6 +38,9 @@ jobs:
         if: matrix.test-type == 'integration'
         run: docker pull postgres:18 && docker pull redis:8.4.0
 
+      - name: Generate Prisma client
+        run: pnpm prisma generate
+
       - name: Run ${{ matrix.test-type }} tests
         run: pnpm test:api:${{ matrix.test-type }}
 
@@ -71,6 +74,9 @@ jobs:
 
       - name: Pull test images
         run: docker pull postgres:18 && docker pull redis:8.4.0
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
 
       - name: Run e2e tests
         run: pnpm test:api:e2e
@@ -124,6 +130,9 @@ jobs:
       - name: Install dependencies
         if: steps.changes.outputs.changed == 'true'
         run: pnpm install
+
+      - name: Generate Prisma client
+        run: pnpm prisma generate
         
       - name: Prune packages
         if: steps.changes.outputs.changed == 'true'
