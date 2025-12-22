@@ -39,6 +39,7 @@ jobs:
         run: docker pull postgres:18 && docker pull redis:8.4.0
 
       - name: Generate Prisma client
+        working-directory: packages/api
         run: pnpm prisma generate
 
       - name: Run ${{ matrix.test-type }} tests
@@ -76,6 +77,7 @@ jobs:
         run: docker pull postgres:18 && docker pull redis:8.4.0
 
       - name: Generate Prisma client
+        working-directory: packages/api
         run: pnpm prisma generate
 
       - name: Run e2e tests
@@ -132,6 +134,7 @@ jobs:
         run: pnpm install
 
       - name: Generate Prisma client
+        working-directory: packages/api
         run: pnpm prisma generate
         
       - name: Prune packages
