@@ -6,6 +6,7 @@
   "scripts": {
     "generate:openapi": "pnpm --filter api generate:openapi",
     "generate:migration": "pnpm --filter api migration:generate",
+    "generate:prisma": "pnpm --filter api generate:prisma",
     "run:migration": "pnpm --filter api migration:run",
     "revert:migration": "pnpm --filter api migration:revert",
     "dev:api": "pnpm --filter api start:dev",
