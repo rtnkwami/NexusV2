@@ -100,10 +100,6 @@ jobs:
       - name: Install dependencies
         if: steps.changes.outputs.changed == 'true'
         run: pnpm install
-
-      - name: Generate Prisma client
-        working-directory: packages/api
-        run: pnpm prisma generate
         
       - name: Prune packages
         if: steps.changes.outputs.changed == 'true'

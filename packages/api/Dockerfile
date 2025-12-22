@@ -17,6 +17,8 @@ COPY ./out/full ./
 
 RUN turbo build
 
+RUN pnpm prisma generate
+
 RUN pnpm deploy --filter=api --prod ./prod
 
 FROM node:24-alpine AS nexus-api
