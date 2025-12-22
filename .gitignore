@@ -79,6 +79,7 @@ build
 
 # API-specific
 packages/api/src/metadata.ts
+packages/api/src/generated
 
 # ============================================
 # WEB / UI (Nuxt)

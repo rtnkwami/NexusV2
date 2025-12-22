@@ -1,45 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { writeFileSync } from 'fs';
 import YAML from 'yaml';
 
-import { newDb } from 'pg-mem';
-import { DataSource } from 'typeorm';
 import { AppModule } from 'src/app.module';
 import { beforeAll, afterAll, it, describe } from 'vitest';
 
-describe('OpenAPI (no external DB)', () => {
+describe('OpenAPI', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
-    const db = newDb();
-
-    db.public.registerFunction({
-      name: 'version',
-      implementation: () => 'PostgreSQL 18.0',
-    });
-
-    db.public.registerFunction({
-      name: 'current_database',
-      implementation: () => 'test_db',
-    });
-
-    const ds: DataSource = await db.adapters.createTypeormDataSource({
-      type: 'postgres',
-      entities: ['../src/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    });
-    await ds.initialize();
-    await ds.synchronize();
-
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(DataSource)
-      .useValue(ds)
-      .compile();
+    }).compile();
 
     app = moduleRef.createNestApplication();
     await app.init();

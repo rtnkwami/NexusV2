@@ -26,6 +26,7 @@ export default defineConfig({
         test: {
           name: 'integration',
           include: ['**/*.integration.spec.ts'],
+          setupFiles: ['test/setup/setup.integration.ts'],
           sequence: {
             shuffle: {
               tests: true,
@@ -40,6 +41,7 @@ export default defineConfig({
           name: 'e2e',
           include: ['**/*.e2e-spec.ts'],
           exclude: ['./test/openapi.e2e-spec.ts'],
+          setupFiles: ['test/setup/setup.e2e.ts'],
           sequence: {
             shuffle: {
               files: true,
